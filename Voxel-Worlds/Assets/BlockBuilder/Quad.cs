@@ -2,14 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Quad : MonoBehaviour
+public class Quad
 {
-    // Start is called before the first frame update
-    void Start()
+    public Mesh Build(Block.BlockSide side, Vector3 offset)
     {
         Mesh mesh;
-        MeshFilter meshFilter = this.gameObject.AddComponent<MeshFilter>();
-        MeshRenderer meshRenderer = this.gameObject.AddComponent<MeshRenderer>();
+
 
         mesh = new Mesh();
         mesh.name = "ScriptedQuad";
@@ -24,20 +22,67 @@ public class Quad : MonoBehaviour
         Vector2 uv01 = new Vector2(0, 1);
         Vector2 uv11 = new Vector2(1, 1);
 
-        Vector3 point0 = new Vector3(-0.5f, -0.5f, 0.5f);
-        Vector3 point1 = new Vector3(0.5f, -0.5f, 0.5f);
-        Vector3 point2 = new Vector3(0.5f, -0.5f, -0.5f);
-        Vector3 point3 = new Vector3(-0.5f, -0.5f, -0.5f);
-        Vector3 point4 = new Vector3(-0.5f, 0.5f, 0.5f);
-        Vector3 point5 = new Vector3(0.5f, 0.5f, 0.5f);
-        Vector3 point6 = new Vector3(0.5f, 0.5f, -0.5f);
-        Vector3 point7 = new Vector3(-0.5f, 0.5f, -0.5f);
+        Vector3 point0 = new Vector3(-0.5f, -0.5f, 0.5f) + offset;
+        Vector3 point1 = new Vector3(0.5f, -0.5f, 0.5f) + offset;
+        Vector3 point2 = new Vector3(0.5f, -0.5f, -0.5f) + offset;
+        Vector3 point3 = new Vector3(-0.5f, -0.5f, -0.5f) + offset;
+        Vector3 point4 = new Vector3(-0.5f, 0.5f, 0.5f) + offset;
+        Vector3 point5 = new Vector3(0.5f, 0.5f, 0.5f) + offset;
+        Vector3 point6 = new Vector3(0.5f, 0.5f, -0.5f) + offset;
+        Vector3 point7 = new Vector3(-0.5f, 0.5f, -0.5f) + offset;
 
-        vertices = new Vector3[] {point4, point5, point1, point0};
-        normals = new Vector3[] {Vector3.forward, Vector3.forward, Vector3.forward, Vector3.forward};
-        uvValues = new Vector2[] {uv11, uv01, uv00, uv10};
         // should specify triangle points in clockwise
         triangles = new[] {3,1,0,3,2,1};
+        
+        switch (side)
+        {
+            case Block.BlockSide.FRONT:
+            {
+                vertices = new Vector3[] {point4, point5, point1, point0};
+                normals = new Vector3[] {Vector3.forward, Vector3.forward, Vector3.forward, Vector3.forward};
+                uvValues = new Vector2[] {uv11, uv01, uv00, uv10};
+                break;
+            }
+            case Block.BlockSide.BACK:
+            {
+                vertices = new Vector3[] {point6, point7, point3, point2};
+                normals = new Vector3[] {Vector3.back, Vector3.back, Vector3.back, Vector3.back};
+                uvValues = new Vector2[] {uv11, uv01, uv00, uv10};
+                break;
+            }
+            case Block.BlockSide.LEFT:
+            {
+                vertices = new Vector3[] {point7, point4, point0, point3};
+                normals = new Vector3[] {Vector3.left, Vector3.left, Vector3.left, Vector3.left};
+                uvValues = new Vector2[] {uv11, uv01, uv00, uv10};
+                break;
+            }
+            case Block.BlockSide.RIGHT:
+            {
+                vertices = new Vector3[] {point5, point6, point2, point1};
+                normals = new Vector3[] {Vector3.right, Vector3.right, Vector3.right, Vector3.right};
+                uvValues = new Vector2[] {uv11, uv01, uv00, uv10};
+                break;
+            }
+            case Block.BlockSide.TOP:
+            {
+                vertices = new Vector3[] {point7, point6, point5, point4};
+                normals = new Vector3[] {Vector3.up, Vector3.up, Vector3.up, Vector3.up};
+                uvValues = new Vector2[] {uv11, uv01, uv00, uv10};
+                break;
+            }
+            case Block.BlockSide.BOTTOM:
+            {
+                vertices = new Vector3[] {point0, point1, point2, point3};
+                normals = new Vector3[] {Vector3.down, Vector3.down, Vector3.down, Vector3.down};
+                uvValues = new Vector2[] {uv11, uv01, uv00, uv10};
+                break;
+            }
+            default:
+            {
+                break;
+            }
+        }
 
         mesh.vertices = vertices;
         mesh.normals = normals;
@@ -46,12 +91,6 @@ public class Quad : MonoBehaviour
         
         mesh.RecalculateBounds();
 
-        meshFilter.mesh = mesh;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        return mesh;
     }
 }
