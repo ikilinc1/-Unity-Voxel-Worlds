@@ -5,7 +5,7 @@ using UnityEngine;
 public class Quad
 {
     public Mesh mesh;
-    public Quad(Block.BlockSide side, Vector3 offset)
+    public Quad(Block.BlockSide side, Vector3 offset, MeshUtils.BlockType blockType)
     {
         mesh = new Mesh();
         mesh.name = "ScriptedQuad";
@@ -15,10 +15,10 @@ public class Quad
         Vector2[] uvValues = new Vector2[4];
         int[] triangles = new int[6];
 
-        Vector2 uv00 = new Vector2(0, 0);
-        Vector2 uv10 = new Vector2(1, 0);
-        Vector2 uv01 = new Vector2(0, 1);
-        Vector2 uv11 = new Vector2(1, 1);
+        Vector2 uv00 = MeshUtils.blockUVs[(int)blockType, 0];
+        Vector2 uv10 = MeshUtils.blockUVs[(int)blockType, 1];
+        Vector2 uv01 = MeshUtils.blockUVs[(int)blockType, 2];
+        Vector2 uv11 = MeshUtils.blockUVs[(int)blockType, 3];
 
         Vector3 point0 = new Vector3(-0.5f, -0.5f, 0.5f) + offset;
         Vector3 point1 = new Vector3(0.5f, -0.5f, 0.5f) + offset;

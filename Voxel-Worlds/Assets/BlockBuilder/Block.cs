@@ -15,19 +15,23 @@ public class Block : MonoBehaviour
         BACK
     };
 
+    public MeshUtils.BlockType blockType = MeshUtils.BlockType.DIRT;
+    public Material atlas;
+    
     // Start is called before the first frame update
     void Start()
     {
         MeshFilter meshFilter = this.gameObject.AddComponent<MeshFilter>();
         MeshRenderer meshRenderer = this.gameObject.AddComponent<MeshRenderer>();
+        meshRenderer.material = atlas;
 
         Quad[] quads = new Quad[6];
-        quads[0] = new Quad(BlockSide.BOTTOM, new Vector3(0, 0, 0));
-        quads[1] = new Quad(BlockSide.TOP, new Vector3(0, 0, 0));
-        quads[2] = new Quad(BlockSide.LEFT, new Vector3(0, 0, 0));
-        quads[3] = new Quad(BlockSide.RIGHT, new Vector3(0, 0, 0));
-        quads[4] = new Quad(BlockSide.FRONT, new Vector3(0, 0, 0));
-        quads[5] = new Quad(BlockSide.BACK, new Vector3(0, 0, 0));
+        quads[0] = new Quad(BlockSide.BOTTOM, new Vector3(0, 0, 0) ,blockType);
+        quads[1] = new Quad(BlockSide.TOP, new Vector3(0, 0, 0) ,blockType);
+        quads[2] = new Quad(BlockSide.LEFT, new Vector3(0, 0, 0) ,blockType);
+        quads[3] = new Quad(BlockSide.RIGHT, new Vector3(0, 0, 0) ,blockType);
+        quads[4] = new Quad(BlockSide.FRONT, new Vector3(0, 0, 0) ,blockType);
+        quads[5] = new Quad(BlockSide.BACK, new Vector3(0, 0, 0) ,blockType);
 
         Mesh[] sideMeshes = new Mesh[6];
         sideMeshes[0] = quads[0].mesh;
