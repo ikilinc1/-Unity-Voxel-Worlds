@@ -166,6 +166,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2d2bbcc28ff1c94c84864c7c74ba40f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blockType: 2
   atlas: {fileID: 2100000, guid: 080f6df9bf7f31644ba95198580a24cf, type: 2}
 --- !u!1 &705507993
 GameObject:
