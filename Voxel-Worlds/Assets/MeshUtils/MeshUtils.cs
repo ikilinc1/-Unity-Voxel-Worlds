@@ -61,6 +61,19 @@ public class MeshUtils
             new Vector2(0.1875f,0.9375f)},
     };
     
+    public static float fBM(float x, float z ,int octaves, float scale, float heightScale, float heightOffset)
+    {
+        float total = 0;
+        float frequency = 1;
+        for (int i = 0; i < octaves; i++)
+        {
+            total += Mathf.PerlinNoise(x * scale * frequency, z * scale * frequency) * heightScale;
+            frequency *= 2;
+        }
+
+        return total + heightOffset;
+    }
+    
     public static Mesh mergeMeshes(Mesh[] meshes)
     {
         Mesh mesh = new Mesh();
