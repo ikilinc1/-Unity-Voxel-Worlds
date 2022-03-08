@@ -19,7 +19,7 @@ public class MeshUtils
     
     public enum BlockType
     {
-      GRASSTOP, GRASSSIDE, DIRT, WATER, STONE, SAND  
+      GRASSTOP, GRASSSIDE, DIRT, WATER, STONE, SAND, AIR  
     };
 
     public static Vector2[,] blockUVs =

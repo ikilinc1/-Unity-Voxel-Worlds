@@ -5,27 +5,76 @@ using UnityEngine;
 public class Block
 {
     public Mesh mesh;
-    public Block(Vector3 offset, MeshUtils.BlockType blockType)
+    private Chunk parentChunk;
+    public Block(Vector3 offset, MeshUtils.BlockType blockType, Chunk chunk)
     {
-        
+        parentChunk = chunk;
 
-        Quad[] quads = new Quad[6];
-        quads[0] = new Quad(MeshUtils.BlockSide.BOTTOM, offset ,blockType);
-        quads[1] = new Quad(MeshUtils.BlockSide.TOP, offset ,blockType);
-        quads[2] = new Quad(MeshUtils.BlockSide.LEFT, offset ,blockType);
-        quads[3] = new Quad(MeshUtils.BlockSide.RIGHT, offset ,blockType);
-        quads[4] = new Quad(MeshUtils.BlockSide.FRONT, offset ,blockType);
-        quads[5] = new Quad(MeshUtils.BlockSide.BACK, offset ,blockType);
+        if (blockType != MeshUtils.BlockType.AIR)
+        {
+            List<Quad> quads = new List<Quad>();
 
-        Mesh[] sideMeshes = new Mesh[6];
-        sideMeshes[0] = quads[0].mesh;
-        sideMeshes[1] = quads[1].mesh;
-        sideMeshes[2] = quads[2].mesh;
-        sideMeshes[3] = quads[3].mesh;
-        sideMeshes[4] = quads[4].mesh;
-        sideMeshes[5] = quads[5].mesh;
+            if (!HasSolidNeighbour((int) offset.x, (int) offset.y - 1, (int) offset.z))
+            {
+                quads.Add(new Quad(MeshUtils.BlockSide.BOTTOM, offset, blockType));
+            }
 
-        mesh = MeshUtils.mergeMeshes(sideMeshes);
-        mesh.name = "Cube_0_0_0";
+            if (!HasSolidNeighbour((int) offset.x, (int) offset.y + 1, (int) offset.z))
+            {
+                quads.Add(new Quad(MeshUtils.BlockSide.TOP, offset, blockType));
+            }
+
+            if (!HasSolidNeighbour((int) offset.x - 1, (int) offset.y, (int) offset.z))
+            {
+                quads.Add(new Quad(MeshUtils.BlockSide.LEFT, offset, blockType));
+            }
+
+            if (!HasSolidNeighbour((int) offset.x + 1, (int) offset.y, (int) offset.z))
+            {
+                quads.Add(new Quad(MeshUtils.BlockSide.RIGHT, offset, blockType));
+            }
+
+            if (!HasSolidNeighbour((int) offset.x, (int) offset.y, (int) offset.z + 1))
+            {
+                quads.Add(new Quad(MeshUtils.BlockSide.FRONT, offset, blockType));
+            }
+
+            if (!HasSolidNeighbour((int) offset.x, (int) offset.y, (int) offset.z - 1))
+            {
+                quads.Add(new Quad(MeshUtils.BlockSide.BACK, offset, blockType));
+            }
+
+            if (quads.Count == 0)
+            {
+                return;
+            }
+
+            Mesh[] sideMeshes = new Mesh[quads.Count];
+            int m = 0;
+            foreach (var q in quads)
+            {
+                sideMeshes[m] = q.mesh;
+                m++;
+            }
+
+            mesh = MeshUtils.mergeMeshes(sideMeshes);
+            mesh.name = "Cube_0_0_0";
+        }
+    }
+
+    public bool HasSolidNeighbour(int x, int y, int z)
+    {
+        if (x < 0 || x >= parentChunk.width || y < 0 || y >= parentChunk.height || z < 0 || z >= parentChunk.depth)
+        {
+            return false;
+        }
+
+        if (parentChunk.chunkData[x + parentChunk.width * (y + parentChunk.depth * z)] == MeshUtils.BlockType.AIR
+            || parentChunk.chunkData[x + parentChunk.width * (y + parentChunk.depth * z)] == MeshUtils.BlockType.WATER)
+        {
+            return false;
+        }
+
+        return true;
     }
 }

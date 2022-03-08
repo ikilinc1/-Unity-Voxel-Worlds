@@ -10,13 +10,34 @@ using UnityEngine.Rendering;
 public class Chunk : MonoBehaviour
 {
 
+    public Material atlas;
+    
     public int width = 2;
     public int height = 2;
     public int depth = 2;
 
     public Block[,,] blocks;
+    // Flat formula --> [x + WIDTH * (y + DEPTH * z)] = Original [x, y, z]
+    public MeshUtils.BlockType[] chunkData;
+
+    void BuildChunk()
+    {
+        int blockCount = width * depth * height;
+        chunkData = new MeshUtils.BlockType[blockCount];
+        for (int i = 0; i < blockCount; i++)
+        {
+            if (UnityEngine.Random.Range(0, 100) < 50)
+            {
+                chunkData[i] = MeshUtils.BlockType.STONE;
+            }
+            else
+            {
+                chunkData[i] = MeshUtils.BlockType.AIR;
+            }
+            
+        }
+    }
     
-    public Material atlas;
     // Start is called before the first frame update
     void Start()
     {
@@ -25,8 +46,9 @@ public class Chunk : MonoBehaviour
         meshRenderer.material = atlas;
 
         blocks = new Block[width, height, depth];
+        BuildChunk();
 
-        var inputMeshes = new List<Mesh>(width * height * depth);
+        var inputMeshes = new List<Mesh>();
         int vertexStart = 0;
         int triStart = 0;
         int meshCount = width * height * depth;
@@ -41,15 +63,18 @@ public class Chunk : MonoBehaviour
             {
                 for (int x = 0; x < width; x++)
                 {
-                    blocks[x, y, z] = new Block(new Vector3(x, y, z), MeshUtils.BlockType.STONE);
-                    inputMeshes.Add(blocks[x,y,z].mesh);
-                    var vCount = blocks[x, y, z].mesh.vertexCount;
-                    var iCount = (int) blocks[x, y, z].mesh.GetIndexCount(0);
-                    jobs.vertexStart[_counter] = vertexStart;
-                    jobs.triStart[_counter] = triStart;
-                    vertexStart += vCount;
-                    triStart += iCount;
-                    _counter++;
+                    blocks[x, y, z] = new Block(new Vector3(x, y, z), chunkData[x + width * (y + depth * z)], this);
+                    if (blocks[x, y, z].mesh != null)
+                    {
+                        inputMeshes.Add(blocks[x, y, z].mesh);
+                        var vCount = blocks[x, y, z].mesh.vertexCount;
+                        var iCount = (int) blocks[x, y, z].mesh.GetIndexCount(0);
+                        jobs.vertexStart[_counter] = vertexStart;
+                        jobs.triStart[_counter] = triStart;
+                        vertexStart += vCount;
+                        triStart += iCount;
+                        _counter++;
+                    }
                 }
             }
         }
@@ -64,7 +89,7 @@ public class Chunk : MonoBehaviour
             new VertexAttributeDescriptor(VertexAttribute.Normal, stream:1),
             new VertexAttributeDescriptor(VertexAttribute.TexCoord0, stream:2));
 
-        var handle = jobs.Schedule(meshCount, 4);
+        var handle = jobs.Schedule(inputMeshes.Count, 4);
         var newMesh = new Mesh();
         newMesh.name = "Chunk";
         var sm = new SubMeshDescriptor(0, triStart, MeshTopology.Triangles);
