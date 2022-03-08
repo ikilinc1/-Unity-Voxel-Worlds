@@ -2,7 +2,8 @@
 
 Exp.  
   
-Side notes   
+Used job manager in order to render chunk elements efficiently   
+Used LineRenderer to represent perlingraph  
 
 Used Packages (Unity Registry)  
  -Burst(1.4.11)    
