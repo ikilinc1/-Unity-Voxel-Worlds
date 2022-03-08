@@ -5,7 +5,7 @@ using UnityEngine;
 public class Quad
 {
     public Mesh mesh;
-    public Quad(Block.BlockSide side, Vector3 offset, MeshUtils.BlockType blockType)
+    public Quad(MeshUtils.BlockSide side, Vector3 offset, MeshUtils.BlockType blockType)
     {
         mesh = new Mesh();
         mesh.name = "ScriptedQuad";
@@ -34,42 +34,42 @@ public class Quad
         
         switch (side)
         {
-            case Block.BlockSide.FRONT:
+            case MeshUtils.BlockSide.FRONT:
             {
                 vertices = new Vector3[] {point4, point5, point1, point0};
                 normals = new Vector3[] {Vector3.forward, Vector3.forward, Vector3.forward, Vector3.forward};
                 uvValues = new Vector2[] {uv11, uv01, uv00, uv10};
                 break;
             }
-            case Block.BlockSide.BACK:
+            case MeshUtils.BlockSide.BACK:
             {
                 vertices = new Vector3[] {point6, point7, point3, point2};
                 normals = new Vector3[] {Vector3.back, Vector3.back, Vector3.back, Vector3.back};
                 uvValues = new Vector2[] {uv11, uv01, uv00, uv10};
                 break;
             }
-            case Block.BlockSide.LEFT:
+            case MeshUtils.BlockSide.LEFT:
             {
                 vertices = new Vector3[] {point7, point4, point0, point3};
                 normals = new Vector3[] {Vector3.left, Vector3.left, Vector3.left, Vector3.left};
                 uvValues = new Vector2[] {uv11, uv01, uv00, uv10};
                 break;
             }
-            case Block.BlockSide.RIGHT:
+            case MeshUtils.BlockSide.RIGHT:
             {
                 vertices = new Vector3[] {point5, point6, point2, point1};
                 normals = new Vector3[] {Vector3.right, Vector3.right, Vector3.right, Vector3.right};
                 uvValues = new Vector2[] {uv11, uv01, uv00, uv10};
                 break;
             }
-            case Block.BlockSide.TOP:
+            case MeshUtils.BlockSide.TOP:
             {
                 vertices = new Vector3[] {point7, point6, point5, point4};
                 normals = new Vector3[] {Vector3.up, Vector3.up, Vector3.up, Vector3.up};
                 uvValues = new Vector2[] {uv11, uv01, uv00, uv10};
                 break;
             }
-            case Block.BlockSide.BOTTOM:
+            case MeshUtils.BlockSide.BOTTOM:
             {
                 vertices = new Vector3[] {point0, point1, point2, point3};
                 normals = new Vector3[] {Vector3.down, Vector3.down, Vector3.down, Vector3.down};
