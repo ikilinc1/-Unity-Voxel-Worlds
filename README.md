@@ -4,6 +4,7 @@ Exp.
   
 Used job manager in order to render chunk elements efficiently   
 Used LineRenderer to represent perlingraph  
+used coroutine to be able to see chunks created  
 
 Used Packages (Unity Registry)  
  -Burst(1.4.11)    
