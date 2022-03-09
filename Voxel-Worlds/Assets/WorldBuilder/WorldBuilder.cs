@@ -7,7 +7,7 @@ using UnityStandardAssets.Utility;
 public class WorldBuilder : MonoBehaviour
 {
 
-    public static Vector3 worldDimensions = new Vector3(3, 3, 3);
+    public static Vector3 worldDimensions = new Vector3(10, 10, 10);
     public static Vector3 chunkDimentions = new Vector3(10,10,10);
     public GameObject chunkPrefab;
     public GameObject mCamera;
@@ -37,6 +37,17 @@ public class WorldBuilder : MonoBehaviour
                 }
             }
         }
+        
+        //switch cameras
+        float xPos = (worldDimensions.x * chunkDimentions.x) / 2.0f;
+        float zPos = (worldDimensions.z * chunkDimentions.z) / 2.0f;
+        Chunk c = chunkPrefab.GetComponent<Chunk>();
+        float yPos = MeshUtils.fBM(xPos, zPos, c.octaves, c.scale, c.heightScale, c.heightOffset)+10.0f;
+        fPC.transform.position = new Vector3(xPos, yPos, zPos);
+        loadingBar.gameObject.SetActive(false);
+        
+        mCamera.SetActive(false);
+        fPC.SetActive(true);
     }
 
     // Update is called once per frame
