@@ -37,6 +37,12 @@ public class WorldBuilder : MonoBehaviour
     public static PerlinSettings stoneSettings;
     public PerlinGrapher stone;
     
+    public static PerlinSettings goldTSettings;
+    public PerlinGrapher goldT;
+    
+    public static PerlinSettings goldBSettings;
+    public PerlinGrapher goldB;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -47,6 +53,12 @@ public class WorldBuilder : MonoBehaviour
         
         stoneSettings = new PerlinSettings(stone.heightScale, stone.scale, stone.octaves, stone.heighOffset,
             stone.probability);
+        
+        goldTSettings = new PerlinSettings(goldT.heightScale, goldT.scale, goldT.octaves, goldT.heighOffset,
+            goldT.probability);
+        
+        goldBSettings = new PerlinSettings(goldB.heightScale, goldB.scale, goldB.octaves, goldB.heighOffset,
+            goldB.probability);
         
         StartCoroutine(BuildWorld());
     }

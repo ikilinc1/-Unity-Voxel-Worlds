@@ -38,10 +38,20 @@ public class Chunk : MonoBehaviour
             
             int stoneHeight =(int)MeshUtils.fBM(x, z, WorldBuilder.stoneSettings.octaves, WorldBuilder.stoneSettings.scale,
                 WorldBuilder.stoneSettings.heightScale, WorldBuilder.stoneSettings.heightOffset);
+            
+            int goldTHeight =(int)MeshUtils.fBM(x, z, WorldBuilder.goldTSettings.octaves, WorldBuilder.goldTSettings.scale,
+                WorldBuilder.goldTSettings.heightScale, WorldBuilder.goldTSettings.heightOffset);
+            
+            int goldBHeight =(int)MeshUtils.fBM(x, z, WorldBuilder.goldBSettings.octaves, WorldBuilder.goldBSettings.scale,
+                WorldBuilder.goldBSettings.heightScale, WorldBuilder.goldBSettings.heightOffset);
 
             if (surfaceHeight == y && UnityEngine.Random.Range(0.0f,1.0f) <= WorldBuilder.surfaceSettings.probability)
             {
                 chunkData[i] = MeshUtils.BlockType.GRASSSIDE;
+            }
+            else if (y< goldTHeight && y> goldBHeight && UnityEngine.Random.Range(0.0f,1.0f) <= WorldBuilder.goldTSettings.probability)
+            {
+                chunkData[i] = MeshUtils.BlockType.GOLD;
             }
             else if (y < stoneHeight && UnityEngine.Random.Range(0.0f,1.0f) <= WorldBuilder.stoneSettings.probability)
             {
