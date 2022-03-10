@@ -24,7 +24,7 @@ public struct PerlinSettings
 public class WorldBuilder : MonoBehaviour
 {
 
-    public static Vector3 worldDimensions = new Vector3(3, 3, 3);
+    public static Vector3 worldDimensions = new Vector3(10, 10, 10);
     public static Vector3 chunkDimentions = new Vector3(10,10,10);
     public GameObject chunkPrefab;
     public GameObject mCamera;
@@ -43,6 +43,9 @@ public class WorldBuilder : MonoBehaviour
     public static PerlinSettings goldBSettings;
     public PerlinGrapher goldB;
     
+    public static PerlinSettings caveSettings;
+    public Perlin3DGrapher caves;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -59,6 +62,9 @@ public class WorldBuilder : MonoBehaviour
         
         goldBSettings = new PerlinSettings(goldB.heightScale, goldB.scale, goldB.octaves, goldB.heighOffset,
             goldB.probability);
+        
+        caveSettings = new PerlinSettings(caves.heightScale, caves.scale, caves.octaves, caves.heighOffset,
+            caves.drawCutOff);
         
         StartCoroutine(BuildWorld());
     }

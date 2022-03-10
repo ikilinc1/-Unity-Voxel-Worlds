@@ -44,7 +44,22 @@ public class Chunk : MonoBehaviour
             
             int goldBHeight =(int)MeshUtils.fBM(x, z, WorldBuilder.goldBSettings.octaves, WorldBuilder.goldBSettings.scale,
                 WorldBuilder.goldBSettings.heightScale, WorldBuilder.goldBSettings.heightOffset);
+            
+            int digCave =(int)MeshUtils.fBM3D(x, y , z, WorldBuilder.caveSettings.octaves, WorldBuilder.caveSettings.scale,
+                WorldBuilder.caveSettings.heightScale, WorldBuilder.caveSettings.heightOffset);
 
+            if (y == 0)
+            {
+                chunkData[i] = MeshUtils.BlockType.BEDROCK;
+                continue;
+            }
+            
+            if (digCave < WorldBuilder.caveSettings.probability)
+            {
+                chunkData[i] = MeshUtils.BlockType.AIR;
+                continue;
+            }
+            
             if (surfaceHeight == y && UnityEngine.Random.Range(0.0f,1.0f) <= WorldBuilder.surfaceSettings.probability)
             {
                 chunkData[i] = MeshUtils.BlockType.GRASSSIDE;
@@ -65,7 +80,9 @@ public class Chunk : MonoBehaviour
             {
                 chunkData[i] = MeshUtils.BlockType.AIR;
             }
-            
+
+
+           
         }
     }
 
