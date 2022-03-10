@@ -17,12 +17,27 @@ public class Block
 
             if (!HasSolidNeighbour((int) blockLocalPos.x, (int) blockLocalPos.y - 1, (int) blockLocalPos.z))
             {
-                quads.Add(new Quad(MeshUtils.BlockSide.BOTTOM, offset, blockType));
+                if (blockType == MeshUtils.BlockType.GRASSSIDE)
+                {
+                    quads.Add(new Quad(MeshUtils.BlockSide.BOTTOM, offset, MeshUtils.BlockType.DIRT));
+                }
+                else
+                {
+                    quads.Add(new Quad(MeshUtils.BlockSide.BOTTOM, offset, blockType));
+                }
             }
 
             if (!HasSolidNeighbour((int) blockLocalPos.x, (int) blockLocalPos.y + 1, (int) blockLocalPos.z))
             {
-                quads.Add(new Quad(MeshUtils.BlockSide.TOP, offset, blockType));
+                if (blockType == MeshUtils.BlockType.GRASSSIDE)
+                {
+                    quads.Add(new Quad(MeshUtils.BlockSide.TOP, offset, MeshUtils.BlockType.GRASSTOP));
+                }
+                else
+                {
+                    quads.Add(new Quad(MeshUtils.BlockSide.TOP, offset, blockType));
+                }
+                
             }
 
             if (!HasSolidNeighbour((int) blockLocalPos.x - 1, (int) blockLocalPos.y, (int) blockLocalPos.z))

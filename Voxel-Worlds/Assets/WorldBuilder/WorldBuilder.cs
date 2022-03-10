@@ -4,20 +4,50 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityStandardAssets.Utility;
 
+public struct PerlinSettings
+{
+    public float heightScale;
+    public float scale;
+    public int octaves;
+    public float heightOffset;
+    public float probability;
+
+    public PerlinSettings(float hs, float s, int o, float ho, float p)
+    {
+        heightScale = hs;
+        scale = s;
+        octaves = o;
+        heightOffset = ho;
+        probability = p;
+    }
+}
 public class WorldBuilder : MonoBehaviour
 {
 
-    public static Vector3 worldDimensions = new Vector3(10, 10, 10);
+    public static Vector3 worldDimensions = new Vector3(3, 3, 3);
     public static Vector3 chunkDimentions = new Vector3(10,10,10);
     public GameObject chunkPrefab;
     public GameObject mCamera;
     public GameObject fPC;
     public Slider loadingBar;
+
+    public static PerlinSettings surfaceSettings;
+    public PerlinGrapher surface;
+    
+    public static PerlinSettings stoneSettings;
+    public PerlinGrapher stone;
     
     // Start is called before the first frame update
     void Start()
     {
         loadingBar.maxValue = worldDimensions.x * worldDimensions.y * worldDimensions.z;
+
+        surfaceSettings = new PerlinSettings(surface.heightScale, surface.scale, surface.octaves, surface.heighOffset,
+            surface.probability);
+        
+        stoneSettings = new PerlinSettings(stone.heightScale, stone.scale, stone.octaves, stone.heighOffset,
+            stone.probability);
+        
         StartCoroutine(BuildWorld());
     }
     
@@ -42,7 +72,7 @@ public class WorldBuilder : MonoBehaviour
         float xPos = (worldDimensions.x * chunkDimentions.x) / 2.0f;
         float zPos = (worldDimensions.z * chunkDimentions.z) / 2.0f;
         Chunk c = chunkPrefab.GetComponent<Chunk>();
-        float yPos = MeshUtils.fBM(xPos, zPos, c.octaves, c.scale, c.heightScale, c.heightOffset)+10.0f;
+        float yPos = MeshUtils.fBM(xPos, zPos, surfaceSettings.octaves, surfaceSettings.scale, surfaceSettings.heightScale, surfaceSettings.heightOffset)+10.0f;
         fPC.transform.position = new Vector3(xPos, yPos, zPos);
         loadingBar.gameObject.SetActive(false);
         
