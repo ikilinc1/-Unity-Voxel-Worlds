@@ -22,6 +22,7 @@ public class Chunk : MonoBehaviour
     // Flat formula --> [x + WIDTH * (y + DEPTH * z)] = Original [x, y, z]
     // Flat to normal --> x=i%WIDTH, y=(i/WIDTH)%HEIGHT, z=i/(WIDTH*HEIGHT)
     public MeshUtils.BlockType[] chunkData;
+    public MeshRenderer meshRenderer;
 
     void BuildChunk()
     {
@@ -99,7 +100,7 @@ public class Chunk : MonoBehaviour
         depth = (int) dimensions.z;
         
         MeshFilter meshFilter = this.gameObject.AddComponent<MeshFilter>();
-        MeshRenderer meshRenderer = this.gameObject.AddComponent<MeshRenderer>();
+        meshRenderer = this.gameObject.AddComponent<MeshRenderer>();
         meshRenderer.material = atlas;
 
         blocks = new Block[width, height, depth];

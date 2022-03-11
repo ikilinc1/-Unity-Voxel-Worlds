@@ -56907,7 +56907,7 @@ MonoBehaviour:
   scale: 0.003
   octaves: 3
   heighOffset: 1.24
-  drawCutOff: 4
+  drawCutOff: 2.36
 --- !u!1 &1236138672607594886
 GameObject:
   m_ObjectHideFlags: 0
