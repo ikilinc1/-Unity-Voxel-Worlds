@@ -131,7 +131,7 @@ public class Chunk : MonoBehaviour
     {
         
     }
-    public void CreateChunk(Vector3 dimensions, Vector3 position)
+    public void CreateChunk(Vector3 dimensions, Vector3 position, bool rebuildBlocks = true)
     {
         location = position;
         width = (int) dimensions.x;
@@ -143,8 +143,11 @@ public class Chunk : MonoBehaviour
         meshRenderer.material = atlas;
 
         blocks = new Block[width, height, depth];
-        BuildChunk();
-
+        if (rebuildBlocks)
+        {
+            BuildChunk();
+        }
+        
         var inputMeshes = new List<Mesh>();
         int vertexStart = 0;
         int triStart = 0;
