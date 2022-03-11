@@ -104,9 +104,36 @@ public class WorldBuilder : MonoBehaviour
                 int posX = (int) (fPCposition.x / chunkDimentions.x ) * chunkDimentions.x;
                 int posZ = (int) (fPCposition.z / chunkDimentions.z ) * chunkDimentions.z;
                 buildQueue.Enqueue(BuildRecursiveWorld(posX, posZ, drawRadius));
+                buildQueue.Enqueue(HideColums(posX, posZ));
             }
 
             yield return wfs;
+        }
+    }
+
+    IEnumerator HideColums(int x, int z)
+    {
+        Vector2Int fPCPos = new Vector2Int(x, z);
+        foreach (Vector2Int cc in chunkColumns)
+        {
+            if ((cc - fPCPos).magnitude >= drawRadius * chunkDimentions.x)
+            {
+                HideChunkColumn(cc.x, cc.y);
+            }
+        }
+
+        yield return null;
+    }
+    
+    public void HideChunkColumn(int x, int z)
+    {
+        for (int y = 0; y < worldDimensions.y; y++)
+        {
+            Vector3Int pos = new Vector3Int(x, y * chunkDimentions.y, z);
+            if (chunkChecker.Contains(pos))
+            {
+                chunks[pos].meshRenderer.enabled = false;
+            }
         }
     }
     
@@ -152,6 +179,7 @@ public class WorldBuilder : MonoBehaviour
                 chunks[position].meshRenderer.enabled = true;
             }
         }
+        chunkColumns.Add(new Vector2Int(x, z));
     }
     
     IEnumerator BuildWorld()
