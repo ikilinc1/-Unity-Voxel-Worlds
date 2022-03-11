@@ -24,7 +24,8 @@ public struct PerlinSettings
 public class WorldBuilder : MonoBehaviour
 {
 
-    public static Vector3Int worldDimensions = new Vector3Int(10, 10, 10);
+    public static Vector3Int worldDimensions = new Vector3Int(20, 5, 20);
+    public static Vector3Int extraWorldDimensions = new Vector3Int(10, 5, 10);
     public static Vector3Int chunkDimentions = new Vector3Int(10,10,10);
     public GameObject chunkPrefab;
     public GameObject mCamera;
@@ -160,7 +161,7 @@ public class WorldBuilder : MonoBehaviour
         StartCoroutine(BuildWorld());
     }
 
-    void BuildChunkColumn(int x, int z)
+    void BuildChunkColumn(int x, int z, bool meshEnabled = true)
     {
         for (int y = 0; y < worldDimensions.y; y++)
         {
@@ -174,14 +175,39 @@ public class WorldBuilder : MonoBehaviour
                 chunkChecker.Add(position);
                 chunks.Add(position, c);   
             }
-            else
-            {
-                chunks[position].meshRenderer.enabled = true;
-            }
+            chunks[position].meshRenderer.enabled = meshEnabled;
+            
         }
         chunkColumns.Add(new Vector2Int(x, z));
     }
-    
+
+    IEnumerator BuildExtraWorld()
+    {
+        int zStart = worldDimensions.z ;
+        int zEnd = worldDimensions.z + extraWorldDimensions.z;
+        
+        int xStart = worldDimensions.x;
+        int xEnd = worldDimensions.x + extraWorldDimensions.x;
+        
+        for (int z = zStart; z < zEnd; z++)
+        {
+            for (int x = 0; x < xEnd; x++)
+            {
+                BuildChunkColumn(x * chunkDimentions.x, z * chunkDimentions.z, false);
+                yield return null;
+            }
+        }
+        
+        for (int z = 0; z < zEnd; z++)
+        {
+            for (int x = xStart; x < xEnd; x++)
+            {
+                BuildChunkColumn(x * chunkDimentions.x, z * chunkDimentions.z, false);
+                yield return null;
+            }
+        }
+    }
+
     IEnumerator BuildWorld()
     {
         for (int z = 0; z < worldDimensions.z; z++)
@@ -206,6 +232,7 @@ public class WorldBuilder : MonoBehaviour
         lastBuildPosition = Vector3Int.CeilToInt(fPC.transform.position);
         StartCoroutine(BuildCoordinator());
         StartCoroutine(UpdateWorld());
+        StartCoroutine(BuildExtraWorld());
     }
     
 }

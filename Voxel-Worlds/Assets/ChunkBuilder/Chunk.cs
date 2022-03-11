@@ -9,7 +9,6 @@ using UnityEngine.Rendering;
 
 public class Chunk : MonoBehaviour
 {
-
     public Material atlas;
     
     public int width = 2;
@@ -24,15 +23,25 @@ public class Chunk : MonoBehaviour
     public MeshUtils.BlockType[] chunkData;
     public MeshRenderer meshRenderer;
 
-    void BuildChunk()
+    private CalculateBlockTypes calculateBlockTypes;
+    private JobHandle jobHandle;
+    public NativeArray<Unity.Mathematics.Random> randomArray { get; private set; }
+
+    struct CalculateBlockTypes: IJobParallelFor
     {
-        int blockCount = width * depth * height;
-        chunkData = new MeshUtils.BlockType[blockCount];
-        for (int i = 0; i < blockCount; i++)
+        public NativeArray<MeshUtils.BlockType> cData;
+        public int width;
+        public int height;
+        public Vector3 location;
+        public NativeArray<Unity.Mathematics.Random> randoms;
+
+        public void Execute(int i)
         {
             int x = i % width + (int)location.x;
             int y = (i / width) % height + (int)location.y;
             int z = i / (width * height) + (int)location.z;
+
+            var random = randoms[i];
 
             int surfaceHeight =(int)MeshUtils.fBM(x, z, WorldBuilder.surfaceSettings.octaves, WorldBuilder.surfaceSettings.scale,
                 WorldBuilder.surfaceSettings.heightScale, WorldBuilder.surfaceSettings.heightOffset);
@@ -51,40 +60,70 @@ public class Chunk : MonoBehaviour
 
             if (y == 0)
             {
-                chunkData[i] = MeshUtils.BlockType.BEDROCK;
-                continue;
+                cData[i] = MeshUtils.BlockType.BEDROCK;
+                return;
             }
             
             if (digCave < WorldBuilder.caveSettings.probability)
             {
-                chunkData[i] = MeshUtils.BlockType.AIR;
-                continue;
+                cData[i] = MeshUtils.BlockType.AIR;
+                return;
             }
             
-            if (surfaceHeight == y && UnityEngine.Random.Range(0.0f,1.0f) <= WorldBuilder.surfaceSettings.probability)
+            if (surfaceHeight == y && random.NextFloat(1) <= WorldBuilder.surfaceSettings.probability)
             {
-                chunkData[i] = MeshUtils.BlockType.GRASSSIDE;
+                cData[i] = MeshUtils.BlockType.GRASSSIDE;
             }
-            else if (y< goldTHeight && y> goldBHeight && UnityEngine.Random.Range(0.0f,1.0f) <= WorldBuilder.goldTSettings.probability)
+            else if (y< goldTHeight && y> goldBHeight && random.NextFloat(1) <= WorldBuilder.goldTSettings.probability)
             {
-                chunkData[i] = MeshUtils.BlockType.GOLD;
+                cData[i] = MeshUtils.BlockType.GOLD;
             }
-            else if (y < stoneHeight && UnityEngine.Random.Range(0.0f,1.0f) <= WorldBuilder.stoneSettings.probability)
+            else if (y < stoneHeight && random.NextFloat(1) <= WorldBuilder.stoneSettings.probability)
             {
-                chunkData[i] = MeshUtils.BlockType.STONE;
+                cData[i] = MeshUtils.BlockType.STONE;
             }
             else if (y<surfaceHeight)
             {
-                chunkData[i] = MeshUtils.BlockType.DIRT;
+                cData[i] = MeshUtils.BlockType.DIRT;
             }
             else
             {
-                chunkData[i] = MeshUtils.BlockType.AIR;
+                cData[i] = MeshUtils.BlockType.AIR;
             }
-
-
-           
         }
+    }
+    
+    void BuildChunk()
+    {
+        int blockCount = width * depth * height;
+        chunkData = new MeshUtils.BlockType[blockCount];
+        NativeArray<MeshUtils.BlockType> blockTypes =
+            new NativeArray<MeshUtils.BlockType>(chunkData, Allocator.Persistent);
+
+        var rArray = new Unity.Mathematics.Random[blockCount];
+        var seed = new System.Random();
+
+        for (int i = 0; i < blockCount; i++)
+        {
+            rArray[i] = new Unity.Mathematics.Random((uint) seed.Next());
+        }
+
+        randomArray = new NativeArray<Unity.Mathematics.Random>(rArray, Allocator.Persistent);
+        
+        calculateBlockTypes = new CalculateBlockTypes()
+        {
+            cData = blockTypes,
+            width = width,
+            height = height,
+            location = location,
+            randoms = randomArray
+        };
+
+        jobHandle = calculateBlockTypes.Schedule(chunkData.Length, 64);
+        jobHandle.Complete();
+        calculateBlockTypes.cData.CopyTo(chunkData);
+        blockTypes.Dispose();
+        randomArray.Dispose();
     }
 
     // Start is called before the first frame update
