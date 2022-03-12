@@ -21,6 +21,7 @@ public class Chunk : MonoBehaviour
     // Flat formula --> [x + WIDTH * (y + DEPTH * z)] = Original [x, y, z]
     // Flat to normal --> x=i%WIDTH, y=(i/WIDTH)%HEIGHT, z=i/(WIDTH*HEIGHT)
     public MeshUtils.BlockType[] chunkData;
+    public MeshUtils.BlockType[] healthData;
     public MeshRenderer meshRenderer;
 
     private CalculateBlockTypes calculateBlockTypes;
@@ -30,6 +31,7 @@ public class Chunk : MonoBehaviour
     struct CalculateBlockTypes: IJobParallelFor
     {
         public NativeArray<MeshUtils.BlockType> cData;
+        public NativeArray<MeshUtils.BlockType> hData;
         public int width;
         public int height;
         public Vector3 location;
@@ -58,6 +60,8 @@ public class Chunk : MonoBehaviour
             int digCave =(int)MeshUtils.fBM3D(x, y , z, WorldBuilder.caveSettings.octaves, WorldBuilder.caveSettings.scale,
                 WorldBuilder.caveSettings.heightScale, WorldBuilder.caveSettings.heightOffset);
 
+            hData[i] = MeshUtils.BlockType.NOCRACK;
+            
             if (y == 0)
             {
                 cData[i] = MeshUtils.BlockType.BEDROCK;
@@ -97,8 +101,11 @@ public class Chunk : MonoBehaviour
     {
         int blockCount = width * depth * height;
         chunkData = new MeshUtils.BlockType[blockCount];
+        healthData = new MeshUtils.BlockType[blockCount];
         NativeArray<MeshUtils.BlockType> blockTypes =
             new NativeArray<MeshUtils.BlockType>(chunkData, Allocator.Persistent);
+        NativeArray<MeshUtils.BlockType> healthTypes =
+            new NativeArray<MeshUtils.BlockType>(healthData, Allocator.Persistent);
 
         var rArray = new Unity.Mathematics.Random[blockCount];
         var seed = new System.Random();
@@ -113,6 +120,7 @@ public class Chunk : MonoBehaviour
         calculateBlockTypes = new CalculateBlockTypes()
         {
             cData = blockTypes,
+            hData = healthTypes,
             width = width,
             height = height,
             location = location,
@@ -122,7 +130,9 @@ public class Chunk : MonoBehaviour
         jobHandle = calculateBlockTypes.Schedule(chunkData.Length, 64);
         jobHandle.Complete();
         calculateBlockTypes.cData.CopyTo(chunkData);
+        calculateBlockTypes.hData.CopyTo(healthData);
         blockTypes.Dispose();
+        healthTypes.Dispose();
         randomArray.Dispose();
     }
 
@@ -163,7 +173,7 @@ public class Chunk : MonoBehaviour
             {
                 for (int x = 0; x < width; x++)
                 {
-                    blocks[x, y, z] = new Block(new Vector3(x, y, z) + location, chunkData[x + width * (y + depth * z)], this);
+                    blocks[x, y, z] = new Block(new Vector3(x, y, z) + location, chunkData[x + width * (y + depth * z)], this, healthData[x + width * (y + depth * z)]);
                     if (blocks[x, y, z].mesh != null)
                     {
                         inputMeshes.Add(blocks[x, y, z].mesh);
@@ -187,7 +197,8 @@ public class Chunk : MonoBehaviour
         jobs.outputMesh.SetVertexBufferParams(vertexStart, 
             new VertexAttributeDescriptor(VertexAttribute.Position), 
             new VertexAttributeDescriptor(VertexAttribute.Normal, stream:1),
-            new VertexAttributeDescriptor(VertexAttribute.TexCoord0, stream:2));
+            new VertexAttributeDescriptor(VertexAttribute.TexCoord0, stream:2),
+            new VertexAttributeDescriptor(VertexAttribute.TexCoord1, stream:3));
 
         var handle = jobs.Schedule(inputMeshes.Count, 4);
         var newMesh = new Mesh();
@@ -235,22 +246,29 @@ public class Chunk : MonoBehaviour
             var uvs = new NativeArray<float3>(vCount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
             // used vector3 for uvs because vector2 give 'weird' results in this job system
             data.GetUVs(0,uvs.Reinterpret<Vector3>());
+            
+            var uvs2 = new NativeArray<float3>(vCount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            // used vector3 for uvs because vector2 give 'weird' results in this job system
+            data.GetUVs(1,uvs2.Reinterpret<Vector3>());
 
             var outputVerts = outputMesh.GetVertexData<Vector3>();
             var outputNormals = outputMesh.GetVertexData<Vector3>(stream:1);
             var outputUVs = outputMesh.GetVertexData<Vector3>(stream:2);
+            var outputUVs2 = outputMesh.GetVertexData<Vector3>(stream:3);
 
             for (int i = 0; i < vCount; i++)
             {
                 outputVerts[i + vStart] = verts[i];
                 outputNormals[i + vStart] = normals[i];
                 outputUVs[i + vStart] = uvs[i];
+                outputUVs2[i + vStart] = uvs2[i];
             }
 
             // disposing native arrays (memory leak otherwise)
             verts.Dispose();
             normals.Dispose();
             uvs.Dispose();
+            uvs2.Dispose();
 
             // Triangles starts from here
             var tStart = triStart[index];

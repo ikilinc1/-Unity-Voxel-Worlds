@@ -5,7 +5,7 @@ using UnityEngine;
 public class Quad
 {
     public Mesh mesh;
-    public Quad(MeshUtils.BlockSide side, Vector3 offset, MeshUtils.BlockType blockType)
+    public Quad(MeshUtils.BlockSide side, Vector3 offset, MeshUtils.BlockType blockType, MeshUtils.BlockType healthType)
     {
         mesh = new Mesh();
         mesh.name = "ScriptedQuad";
@@ -14,6 +14,12 @@ public class Quad
         Vector3[] normals = new Vector3[4];
         Vector2[] uvValues = new Vector2[4];
         int[] triangles = new int[6];
+
+        List<Vector2> suvs = new List<Vector2>();
+        suvs.Add(MeshUtils.blockUVs[(int)healthType, 3]);
+        suvs.Add(MeshUtils.blockUVs[(int)healthType, 2]);
+        suvs.Add(MeshUtils.blockUVs[(int)healthType, 0]);
+        suvs.Add(MeshUtils.blockUVs[(int)healthType, 1]);
 
         Vector2 uv00 = MeshUtils.blockUVs[(int)blockType, 0];
         Vector2 uv10 = MeshUtils.blockUVs[(int)blockType, 1];
@@ -86,6 +92,7 @@ public class Quad
         mesh.normals = normals;
         mesh.uv = uvValues;
         mesh.triangles = triangles;
+        mesh.SetUVs(1, suvs);
         
         mesh.RecalculateBounds();
     }

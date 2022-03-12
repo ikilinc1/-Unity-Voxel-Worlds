@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using VertexData = System.Tuple<UnityEngine.Vector3, UnityEngine.Vector3, UnityEngine.Vector2>;
+using VertexData = System.Tuple<UnityEngine.Vector3, UnityEngine.Vector3, UnityEngine.Vector2, UnityEngine.Vector2>;
 public class MeshUtils 
 {
 
@@ -16,6 +16,10 @@ public class MeshUtils
         BACK
     };
 
+    public static int[] blockTypeHealth =
+    {
+        2, 2, 2, 1, 4, 1, 4, -1, 3, 4, -1, -1, -1, -1, -1, -1
+    };
     
     public enum BlockType {
         GRASSTOP, GRASSSIDE, DIRT, WATER, STONE, SAND, GOLD, BEDROCK, REDSTONE, DIAMOND, NOCRACK,
@@ -104,8 +108,9 @@ public class MeshUtils
                 Vector3 vertice = meshes[i].vertices[j];
                 Vector3 normal = meshes[i].normals[j];
                 Vector2 uvValue = meshes[i].uv[j];
+                Vector2 uvValueCracks = meshes[i].uv2[j];
 
-                VertexData points = new VertexData(vertice, normal, uvValue);
+                VertexData points = new VertexData(vertice, normal, uvValue, uvValueCracks);
 
                 if (!pointsHash.Contains(points))
                 {
@@ -123,8 +128,9 @@ public class MeshUtils
                 Vector3 vertice = meshes[i].vertices[triPoint];
                 Vector3 normal = meshes[i].normals[triPoint];
                 Vector2 uvValue = meshes[i].uv[triPoint];
+                Vector2 uvValueCracks = meshes[i].uv2[triPoint];
                 
-                VertexData points = new VertexData(vertice, normal, uvValue);
+                VertexData points = new VertexData(vertice, normal, uvValue, uvValueCracks);
 
                 int index;
                 pointsOrder.TryGetValue(points, out index);
@@ -146,17 +152,20 @@ public class MeshUtils
         List<Vector3> vertices = new List<Vector3>();
         List<Vector3> normals = new List<Vector3>();
         List<Vector2> uvValues = new List<Vector2>();
+        List<Vector2> uvValuesCracks = new List<Vector2>();
 
         foreach (var i in list.Keys)
         {
             vertices.Add(i.Item1);
             normals.Add(i.Item2);
             uvValues.Add(i.Item3);
+            uvValuesCracks.Add(i.Item4);
         }
 
         mesh.vertices = vertices.ToArray();
         mesh.normals = normals.ToArray();
         mesh.uv = uvValues.ToArray();
+        mesh.uv2 = uvValuesCracks.ToArray();
     }
   
 }
