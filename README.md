@@ -10,6 +10,7 @@ used parrallel jobs to calculate perlin (chunk and world building optimization)
 Used Packages (Unity Registry)  
  -Burst(1.4.11)    
  -Input System(1.2.1)  
+ -2D Sprite(1.0.0)  
 
 Unity version-->2020.3.26f1  
 Current proggress --> In Progress.
