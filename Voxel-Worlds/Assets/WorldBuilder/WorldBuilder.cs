@@ -57,6 +57,8 @@ public class WorldBuilder : MonoBehaviour
 
     private Queue<IEnumerator> buildQueue = new Queue<IEnumerator>();
 
+    private MeshUtils.BlockType buildType = MeshUtils.BlockType.DIRT;
+
     IEnumerator BuildCoordinator()
     {
         while (true)
@@ -161,7 +163,12 @@ public class WorldBuilder : MonoBehaviour
         
         StartCoroutine(BuildWorld());
     }
-
+    
+    public void SetBuildType(int type)
+    {
+        buildType = (MeshUtils.BlockType) type;
+    }
+    
     void Update()
     {
         if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
@@ -175,6 +182,10 @@ public class WorldBuilder : MonoBehaviour
                 {
                     hitBlock = hit.point - hit.normal / 2.0f;
                 }
+                else
+                {
+                    hitBlock = hit.point + hit.normal / 2.0f;
+                }
 
                 Chunk thisChunk = hit.collider.gameObject.GetComponent<Chunk>();
 
@@ -182,8 +193,67 @@ public class WorldBuilder : MonoBehaviour
                 int by = (int) (Mathf.Round(hitBlock.y) - thisChunk.location.y);
                 int bz = (int) (Mathf.Round(hitBlock.z) - thisChunk.location.z);
 
+                //calculatin neighbour chunks
+                Vector3Int neighbour;
+                if (bx == chunkDimentions.x)
+                {
+                    neighbour = new Vector3Int((int) thisChunk.location.x + chunkDimentions.x,
+                        (int) thisChunk.location.y,
+                        (int) thisChunk.location.z);
+                    thisChunk = chunks[neighbour];
+                    bx = 0;
+                }else if (bx == -1)
+                {
+                    neighbour = new Vector3Int((int) thisChunk.location.x - chunkDimentions.x,
+                        (int) thisChunk.location.y,
+                        (int) thisChunk.location.z);
+                    thisChunk = chunks[neighbour];
+                    bx = chunkDimentions.x - 1;
+                }
+                
+                if (by == chunkDimentions.y)
+                {
+                    neighbour = new Vector3Int((int) thisChunk.location.x,
+                        (int) thisChunk.location.y + chunkDimentions.y,
+                        (int) thisChunk.location.z);
+                    thisChunk = chunks[neighbour];
+                    by = 0;
+                }else if (by == -1)
+                {
+                    neighbour = new Vector3Int((int) thisChunk.location.x ,
+                        (int) thisChunk.location.y - chunkDimentions.y,
+                        (int) thisChunk.location.z);
+                    thisChunk = chunks[neighbour];
+                    by = chunkDimentions.y - 1;
+                }
+                
+                if (bz == chunkDimentions.z)
+                {
+                    neighbour = new Vector3Int((int) thisChunk.location.x,
+                        (int) thisChunk.location.y,
+                        (int) thisChunk.location.z + chunkDimentions.z);
+                    thisChunk = chunks[neighbour];
+                    bz = 0;
+                }else if (bz == -1)
+                {
+                    neighbour = new Vector3Int((int) thisChunk.location.x,
+                        (int) thisChunk.location.y,
+                        (int) thisChunk.location.z - chunkDimentions.z);
+                    thisChunk = chunks[neighbour];
+                    bz = chunkDimentions.z - 1;
+                }
+                //---------------------------
                 int i = bx + chunkDimentions.x * (by + chunkDimentions.z * bz); // flatten
-                thisChunk.chunkData[i] = MeshUtils.BlockType.AIR;
+                
+                if (Input.GetMouseButtonDown(0))
+                {
+                    thisChunk.chunkData[i] = MeshUtils.BlockType.AIR;
+                }
+                else
+                {
+                    thisChunk.chunkData[i] = buildType;
+                }
+                
                 DestroyImmediate(thisChunk.GetComponent<MeshFilter>());
                 DestroyImmediate(thisChunk.GetComponent<MeshRenderer>());
                 DestroyImmediate(thisChunk.GetComponent<Collider>());
