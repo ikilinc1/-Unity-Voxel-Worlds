@@ -28,6 +28,9 @@ public class WorldBuilder : MonoBehaviour
     public static Vector3Int worldDimensions = new Vector3Int(5, 5, 5);
     public static Vector3Int extraWorldDimensions = new Vector3Int(5, 5, 5);
     public static Vector3Int chunkDimentions = new Vector3Int(10,10,10);
+
+    public bool loadFromFile = false;
+    
     public GameObject chunkPrefab;
     public GameObject mCamera;
     public GameObject fPC;
@@ -75,6 +78,68 @@ public class WorldBuilder : MonoBehaviour
     public void SaveWorld()
     {
         FileSaver.save(this);
+    }
+
+    IEnumerator LoadWorldFromFile()
+    {
+        WorldData wd = FileSaver.load();
+        if (wd == null)
+        {
+            StartCoroutine(BuildWorld());
+            yield break;
+        }
+        
+        chunkChecker.Clear();
+        for (int i = 0; i < wd.chunkCheckerValues.Length; i+=3)
+        {
+            chunkChecker.Add(new Vector3Int(wd.chunkCheckerValues[i],
+                wd.chunkCheckerValues[i + 1], wd.chunkCheckerValues[i + 2]));
+        }
+        
+        chunkColumns.Clear();
+        for (int i = 0; i < wd.chunkColumnValues.Length; i+=2)
+        {
+            chunkColumns.Add(new Vector2Int(wd.chunkColumnValues[i], wd.chunkColumnValues[i + 1]));
+        }
+
+        loadingBar.maxValue = chunkChecker.Count;
+        
+        int index = 0;
+        int vIndex = 0;
+        foreach (Vector3Int chunkPos in chunkChecker)
+        {
+            GameObject chunk = Instantiate(chunkPrefab);
+            chunk.name = "Chunk_" + chunkPos.x + "_" + chunkPos.y + "_" + chunkPos.z;
+            Chunk c = chunk.GetComponent<Chunk>();
+            int blockCount = chunkDimentions.x * chunkDimentions.y * chunkDimentions.z;
+            c.chunkData = new MeshUtils.BlockType[blockCount];
+            c.healthData = new MeshUtils.BlockType[blockCount];
+
+            for (int i = 0; i < blockCount; i++)
+            {
+                c.chunkData[i] = (MeshUtils.BlockType) wd.allChunkData[index];
+                c.healthData[i] = MeshUtils.BlockType.NOCRACK;
+                index++;
+            }
+
+            loadingBar.value++;
+            c.CreateChunk(chunkDimentions, chunkPos, false);
+            chunks.Add(chunkPos,c);
+            RedrawChunk(c);
+            c.meshRenderer.enabled = wd.chunkVisibility[vIndex];
+            vIndex++;
+            yield return null;
+        }
+
+        fPC.transform.position = new Vector3(wd.fpcX, wd.fpcY, wd.fpcZ);
+        mCamera.SetActive(false);
+        fPC.SetActive(true);
+        loadingBar.gameObject.SetActive(false);
+        lastBuildPosition = Vector3Int.CeilToInt(fPC.transform.position);
+        StartCoroutine(BuildCoordinator());
+        StartCoroutine(UpdateWorld());
+        
+        yield return null;
     }
 
     IEnumerator BuildRecursiveWorld(int x, int z, int radius)
@@ -165,8 +230,15 @@ public class WorldBuilder : MonoBehaviour
         
         caveSettings = new PerlinSettings(caves.heightScale, caves.scale, caves.octaves, caves.heighOffset,
             caves.drawCutOff);
-        
-        StartCoroutine(BuildWorld());
+
+        if (loadFromFile)
+        {
+            StartCoroutine(LoadWorldFromFile());
+        }
+        else
+        {
+            StartCoroutine(BuildWorld());
+        }
     }
     
     public void SetBuildType(int type)
@@ -369,7 +441,7 @@ public class WorldBuilder : MonoBehaviour
         fPC.SetActive(true);
         lastBuildPosition = Vector3Int.CeilToInt(fPC.transform.position);
         StartCoroutine(BuildCoordinator());
-        //StartCoroutine(UpdateWorld()); // temp
+        StartCoroutine(UpdateWorld());
         StartCoroutine(BuildExtraWorld());
     }
     

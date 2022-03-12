@@ -16,6 +16,7 @@ public class WorldData
     public int[] chunkCheckerValues;
     public int[] chunkColumnValues;
     public int[] allChunkData;
+    public bool[] chunkVisibility;
 
     public int fpcX;
     public int fpcY;
@@ -45,6 +46,8 @@ public class WorldData
         }
 
         allChunkData = new int[chks.Count * WorldBuilder.chunkDimentions.x * WorldBuilder.chunkDimentions.y * WorldBuilder.chunkDimentions.z];
+        chunkVisibility = new bool[chks.Count];
+        int vIndex = 0;
         index = 0;
         foreach (KeyValuePair<Vector3Int, Chunk> ch in chks)
         {
@@ -53,6 +56,9 @@ public class WorldData
                 allChunkData[index] = (int) bt;
                 index++;
             }
+
+            chunkVisibility[vIndex] = ch.Value.meshRenderer.enabled;
+            vIndex++;
         }
 
         fpcX = (int) fpc.x;
@@ -91,5 +97,22 @@ public static class FileSaver
         bf.Serialize(file, wd);
         file.Close();
         Debug.Log("Saving World to File -> " + fileName);
+    }
+
+    public static WorldData load()
+    {
+        string fileName = BuildFileName();
+        if (File.Exists(fileName))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(fileName, FileMode.Open);
+            wd = new WorldData();
+            wd = (WorldData) bf.Deserialize(file);
+            file.Close();
+            Debug.Log("Loading World from File ->" + fileName);
+            return wd;
+        }
+
+        return null;
     }
 }
