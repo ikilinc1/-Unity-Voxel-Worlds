@@ -6,6 +6,7 @@ Used job manager in order to render chunk elements efficiently
 Used LineRenderer to represent perlingraph  
 used coroutine to be able to see chunks created  
 used parrallel jobs to calculate perlin (chunk and world building optimization)  
+save and load system uses binary system  
 
 Used Packages (Unity Registry)  
  -Burst(1.4.11)    
