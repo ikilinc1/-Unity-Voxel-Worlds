@@ -48,9 +48,9 @@ public class WorldBuilder : MonoBehaviour
     public static PerlinSettings caveSettings;
     public Perlin3DGrapher caves;
 
-    private HashSet<Vector3Int> chunkChecker = new HashSet<Vector3Int>();
-    private HashSet<Vector2Int> chunkColumns = new HashSet<Vector2Int>();
-    private Dictionary<Vector3Int, Chunk> chunks = new Dictionary<Vector3Int, Chunk>();
+    public HashSet<Vector3Int> chunkChecker = new HashSet<Vector3Int>();
+    public HashSet<Vector2Int> chunkColumns = new HashSet<Vector2Int>();
+    public Dictionary<Vector3Int, Chunk> chunks = new Dictionary<Vector3Int, Chunk>();
 
     private Vector3Int lastBuildPosition;
     public int drawRadius = 3;
@@ -70,6 +70,11 @@ public class WorldBuilder : MonoBehaviour
 
             yield return null;
         }
+    }
+
+    public void SaveWorld()
+    {
+        FileSaver.save(this);
     }
 
     IEnumerator BuildRecursiveWorld(int x, int z, int radius)
