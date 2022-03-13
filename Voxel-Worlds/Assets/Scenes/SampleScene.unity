@@ -878,6 +878,7 @@ MonoBehaviour:
   goldT: {fileID: 1826934289}
   goldB: {fileID: 705075953}
   caves: {fileID: 1236138672589064244, guid: 5e94778c0128dee4897d935f6ce9a31f, type: 3}
+  trees: {fileID: 1236138672589064244, guid: db8135d9cfd8a3243870b1ec65688161, type: 3}
   drawRadius: 3
 --- !u!4 &764169035
 Transform:
@@ -1970,7 +1971,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 5
+          m_IntArgument: 8
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -2649,7 +2650,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 6
+          m_IntArgument: 9
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0

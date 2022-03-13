@@ -50,6 +50,9 @@ public class WorldBuilder : MonoBehaviour
     
     public static PerlinSettings caveSettings;
     public Perlin3DGrapher caves;
+    
+    public static PerlinSettings treeSettings;
+    public Perlin3DGrapher trees;
 
     public HashSet<Vector3Int> chunkChecker = new HashSet<Vector3Int>();
     public HashSet<Vector2Int> chunkColumns = new HashSet<Vector2Int>();
@@ -230,6 +233,9 @@ public class WorldBuilder : MonoBehaviour
         
         caveSettings = new PerlinSettings(caves.heightScale, caves.scale, caves.octaves, caves.heighOffset,
             caves.drawCutOff);
+        
+        treeSettings = new PerlinSettings(trees.heightScale, trees.scale, trees.octaves, trees.heighOffset,
+            trees.drawCutOff);
 
         if (loadFromFile)
         {
@@ -246,14 +252,14 @@ public class WorldBuilder : MonoBehaviour
         buildType = (MeshUtils.BlockType) type;
     }
 
-    Vector3Int FromFlat(int i)
+    public static Vector3Int FromFlat(int i)
     {
         return new Vector3Int(i % chunkDimentions.x, 
             (i / chunkDimentions.x) % chunkDimentions.y,
             i / (chunkDimentions.x * chunkDimentions.y));
     }
 
-    int ToFlat(Vector3Int v)
+    public static int ToFlat(Vector3Int v)
     {
         return v.x + chunkDimentions.x * (v.y + chunkDimentions.z * v.z);
     }

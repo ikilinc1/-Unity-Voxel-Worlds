@@ -17,9 +17,10 @@ public class MeshUtils
     };
 
     public static int[] blockTypeHealth =
-    {
-        2, 2, 2, 1, 4, 1, 4, -1, 3, 4, -1, -1, -1, -1, -1, -1
+    { 
+        2, 2, 1, 1, 4, 1, 3, 3, 3, 4, -1, 3, 4, -1, -1, -1, -1, -1, -1
     };
+
 
     public static HashSet<BlockType> canDrop = new HashSet<BlockType>
     {
@@ -32,7 +33,7 @@ public class MeshUtils
     };
 
     public enum BlockType {
-        GRASSTOP, GRASSSIDE, DIRT, WATER, STONE, SAND, GOLD, BEDROCK, REDSTONE, DIAMOND, NOCRACK,
+        GRASSTOP, GRASSSIDE, DIRT, WATER, STONE, LEAVES, WOOD, WOODBASE, SAND, GOLD, BEDROCK, REDSTONE, DIAMOND, NOCRACK,
         CRACK1, CRACK2, CRACK3, CRACK4, AIR
     };
     
@@ -41,32 +42,39 @@ public class MeshUtils
                         new Vector2(0.125f, 0.4375f), new Vector2(0.1875f,0.4375f) },
         /*GRASSSIDE*/ { new Vector2( 0.1875f, 0.9375f ), new Vector2( 0.25f, 0.9375f),
                         new Vector2( 0.1875f, 1.0f ),new Vector2( 0.25f, 1.0f )},
-        /*DIRT*/      { new Vector2( 0.125f, 0.9375f ), new Vector2( 0.1875f, 0.9375f),
+        /*DIRT*/	  { new Vector2( 0.125f, 0.9375f ), new Vector2( 0.1875f, 0.9375f),
                         new Vector2( 0.125f, 1.0f ),new Vector2( 0.1875f, 1.0f )},
-        /*WATER*/     { new Vector2(0.875f,0.125f),  new Vector2(0.9375f,0.125f),
+        /*WATER*/	  { new Vector2(0.875f,0.125f),  new Vector2(0.9375f,0.125f),
                         new Vector2(0.875f,0.1875f), new Vector2(0.9375f,0.1875f)},
-        /*STONE*/     { new Vector2( 0, 0.875f ), new Vector2( 0.0625f, 0.875f),
+        /*STONE*/	  { new Vector2( 0, 0.875f ), new Vector2( 0.0625f, 0.875f),
                         new Vector2( 0, 0.9375f ),new Vector2( 0.0625f, 0.9375f )},
-        /*SAND*/      { new Vector2(0.125f,0.875f),  new Vector2(0.1875f,0.875f),
+        /*LEAVES*/	  { new Vector2(0.0625f,0.375f),  new Vector2(0.125f,0.375f),
+                        new Vector2(0.0625f,0.4375f), new Vector2(0.125f,0.4375f)},
+ 		/*WOOD*/	  { new Vector2(0.375f,0.625f),  new Vector2(0.4375f,0.625f),
+                        new Vector2(0.375f,0.6875f), new Vector2(0.4375f,0.6875f)},
+ 		/*WOODBASE*/  { new Vector2(0.375f,0.625f),  new Vector2(0.4375f,0.625f),
+                        new Vector2(0.375f,0.6875f), new Vector2(0.4375f,0.6875f)},	    
+        /*SAND*/	  { new Vector2(0.125f,0.875f),  new Vector2(0.1875f,0.875f),
                         new Vector2(0.125f,0.9375f), new Vector2(0.1875f,0.9375f)},
-        /*GOLD*/        { new Vector2(0f,0.8125f),  new Vector2(0.0625f,0.8125f),
+        /*GOLD*/		{ new Vector2(0f,0.8125f),  new Vector2(0.0625f,0.8125f),
                           new Vector2(0f,0.875f), new Vector2(0.0625f,0.875f)},
-        /*BEDROCK*/     {new Vector2( 0.3125f, 0.8125f ), new Vector2( 0.375f, 0.8125f),
+		/*BEDROCK*/		{new Vector2( 0.3125f, 0.8125f ), new Vector2( 0.375f, 0.8125f),
                                 new Vector2( 0.3125f, 0.875f ),new Vector2( 0.375f, 0.875f )},
-        /*REDSTONE*/    {new Vector2( 0.1875f, 0.75f ), new Vector2( 0.25f, 0.75f),
+		/*REDSTONE*/	{new Vector2( 0.1875f, 0.75f ), new Vector2( 0.25f, 0.75f),
                                 new Vector2( 0.1875f, 0.8125f ),new Vector2( 0.25f, 0.8125f )},
-        /*DIAMOND*/     {new Vector2( 0.125f, 0.75f ), new Vector2( 0.1875f, 0.75f),
+		/*DIAMOND*/		{new Vector2( 0.125f, 0.75f ), new Vector2( 0.1875f, 0.75f),
                                 new Vector2( 0.125f, 0.8125f ),new Vector2( 0.1875f, 0.8125f )},
-        /*NOCRACK*/     {new Vector2( 0.6875f, 0f ), new Vector2( 0.75f, 0f),
+		/*NOCRACK*/		{new Vector2( 0.6875f, 0f ), new Vector2( 0.75f, 0f),
                                 new Vector2( 0.6875f, 0.0625f ),new Vector2( 0.75f, 0.0625f )},
-        /*CRACK1*/      { new Vector2(0f,0f),  new Vector2(0.0625f,0f),
+		/*CRACK1*/		{ new Vector2(0f,0f),  new Vector2(0.0625f,0f),
                                  new Vector2(0f,0.0625f), new Vector2(0.0625f,0.0625f)},
-        /*CRACK2*/      { new Vector2(0.0625f,0f),  new Vector2(0.125f,0f),
+ 		/*CRACK2*/		{ new Vector2(0.0625f,0f),  new Vector2(0.125f,0f),
                                  new Vector2(0.0625f,0.0625f), new Vector2(0.125f,0.0625f)},
-        /*CRACK3*/      { new Vector2(0.125f,0f),  new Vector2(0.1875f,0f),
+ 		/*CRACK3*/		{ new Vector2(0.125f,0f),  new Vector2(0.1875f,0f),
                                  new Vector2(0.125f,0.0625f), new Vector2(0.1875f,0.0625f)},
-        /*CRACK4*/      { new Vector2(0.1875f,0f),  new Vector2(0.25f,0f),
+ 		/*CRACK4*/		{ new Vector2(0.1875f,0f),  new Vector2(0.25f,0f),
                                  new Vector2(0.1875f,0.0625f), new Vector2(0.25f,0.0625f)}
+  
     };
     
     public static float fBM(float x, float z ,int octaves, float scale, float heightScale, float heightOffset)

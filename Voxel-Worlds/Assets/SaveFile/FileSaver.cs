@@ -73,7 +73,6 @@ public static class FileSaver
 
     static string BuildFileName()
     {
-        Debug.Log(Application.persistentDataPath);
         return Application.persistentDataPath + "/savedata/World_" +
                WorldBuilder.chunkDimentions.x + "-" +
                WorldBuilder.chunkDimentions.y + "-" +

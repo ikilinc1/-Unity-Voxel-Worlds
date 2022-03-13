@@ -28,6 +28,32 @@ public class Chunk : MonoBehaviour
     private JobHandle jobHandle;
     public NativeArray<Unity.Mathematics.Random> randomArray { get; private set; }
 
+    private (Vector3Int, MeshUtils.BlockType)[] treeDesign = new (Vector3Int, MeshUtils.BlockType)[]
+    {
+        (new Vector3Int(0,3,-1), MeshUtils.BlockType.LEAVES),
+        (new Vector3Int(1,3,-1), MeshUtils.BlockType.LEAVES),
+        (new Vector3Int(-1,4,-1), MeshUtils.BlockType.LEAVES),
+        (new Vector3Int(1,4,-1), MeshUtils.BlockType.LEAVES),
+        (new Vector3Int(0,5,-1), MeshUtils.BlockType.LEAVES),
+        (new Vector3Int(0,0,0), MeshUtils.BlockType.WOOD),
+        (new Vector3Int(0,1,0), MeshUtils.BlockType.WOOD),
+        (new Vector3Int(-1,2,0), MeshUtils.BlockType.LEAVES),
+        (new Vector3Int(0,2,0), MeshUtils.BlockType.WOOD),
+        (new Vector3Int(1,2,0), MeshUtils.BlockType.LEAVES),
+        (new Vector3Int(0,3,0), MeshUtils.BlockType.WOOD),
+        (new Vector3Int(-1,4,0), MeshUtils.BlockType.LEAVES),
+        (new Vector3Int(0,4,0), MeshUtils.BlockType.WOOD),
+        (new Vector3Int(1,4,0), MeshUtils.BlockType.LEAVES),
+        (new Vector3Int(-1,5,0), MeshUtils.BlockType.LEAVES),
+        (new Vector3Int(0,5,0), MeshUtils.BlockType.LEAVES),
+        (new Vector3Int(1,5,0), MeshUtils.BlockType.LEAVES),
+        (new Vector3Int(0,2,1), MeshUtils.BlockType.LEAVES),
+        (new Vector3Int(0,3,1), MeshUtils.BlockType.LEAVES),
+        (new Vector3Int(1,3,1), MeshUtils.BlockType.LEAVES),
+        (new Vector3Int(-1,4,1), MeshUtils.BlockType.LEAVES),
+        (new Vector3Int(0,5,1), MeshUtils.BlockType.LEAVES)
+    };
+    
     struct CalculateBlockTypes: IJobParallelFor
     {
         public NativeArray<MeshUtils.BlockType> cData;
@@ -59,6 +85,9 @@ public class Chunk : MonoBehaviour
             
             int digCave =(int)MeshUtils.fBM3D(x, y , z, WorldBuilder.caveSettings.octaves, WorldBuilder.caveSettings.scale,
                 WorldBuilder.caveSettings.heightScale, WorldBuilder.caveSettings.heightOffset);
+            
+            int plantTree =(int)MeshUtils.fBM3D(x, y , z, WorldBuilder.treeSettings.octaves, WorldBuilder.treeSettings.scale,
+                WorldBuilder.treeSettings.heightScale, WorldBuilder.treeSettings.heightOffset);
 
             hData[i] = MeshUtils.BlockType.NOCRACK;
             
@@ -76,7 +105,15 @@ public class Chunk : MonoBehaviour
             
             if (surfaceHeight == y && random.NextFloat(1) <= WorldBuilder.surfaceSettings.probability)
             {
-                cData[i] = MeshUtils.BlockType.GRASSSIDE;
+                if (plantTree < WorldBuilder.treeSettings.probability && random.NextFloat(1) <= 0.1)
+                {
+                    cData[i] = MeshUtils.BlockType.WOODBASE;
+                }
+                else
+                {
+                    cData[i] = MeshUtils.BlockType.GRASSSIDE;
+                }
+                
             }
             else if (y< goldTHeight && y> goldBHeight && random.NextFloat(1) <= WorldBuilder.goldTSettings.probability)
             {
@@ -134,6 +171,28 @@ public class Chunk : MonoBehaviour
         blockTypes.Dispose();
         healthTypes.Dispose();
         randomArray.Dispose();
+
+        BuildTrees();
+    }
+
+    void BuildTrees()
+    {
+        for (int i = 0; i < chunkData.Length; i++)
+        {
+            if (chunkData[i] == MeshUtils.BlockType.WOODBASE)
+            {
+                foreach ((Vector3Int,MeshUtils.BlockType) v in treeDesign)
+                {
+                    Vector3Int blockPos = WorldBuilder.FromFlat(i) + v.Item1;
+                    int bIndex = WorldBuilder.ToFlat(blockPos);
+                    if (bIndex >= 0 && bIndex < chunkData.Length)
+                    {
+                        chunkData[bIndex] = v.Item2;
+                        healthData[bIndex] = MeshUtils.BlockType.NOCRACK;
+                    }
+                }
+            }
+        }
     }
 
     // Start is called before the first frame update
