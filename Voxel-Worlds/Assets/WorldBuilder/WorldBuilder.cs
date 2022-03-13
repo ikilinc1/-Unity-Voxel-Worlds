@@ -402,9 +402,9 @@ public class WorldBuilder : MonoBehaviour
 
     private WaitForSeconds dropDelay = new WaitForSeconds(0.2f);
 
-    public IEnumerator Drop(Chunk c, int blockIndex)
+    public IEnumerator Drop(Chunk c, int blockIndex, int strenght = 6)
     {
-        if (c.chunkData[blockIndex] != MeshUtils.BlockType.SAND)
+        if (!MeshUtils.canDrop.Contains(c.chunkData[blockIndex]))
         {
             yield break;
         }
@@ -420,9 +420,9 @@ public class WorldBuilder : MonoBehaviour
             Vector3Int block = neighbourBlock.Item1;
             int neighbourBlockIndex = ToFlat(block);
             Chunk neighbourChunk = chunks[neighbourBlock.Item2];
-            if (neighbourChunk.chunkData[neighbourBlockIndex] == MeshUtils.BlockType.AIR)
+            if (neighbourChunk != null && neighbourChunk.chunkData[neighbourBlockIndex] == MeshUtils.BlockType.AIR)
             {
-                neighbourChunk.chunkData[neighbourBlockIndex] = MeshUtils.BlockType.SAND;
+                neighbourChunk.chunkData[neighbourBlockIndex] = c.chunkData[blockIndex];
                 neighbourChunk.healthData[neighbourBlockIndex] = MeshUtils.BlockType.NOCRACK;
 
                 var nBlockAbove = GetWorldNeighbour(new Vector3Int(thisBlock.x, thisBlock.y + 1, thisBlock.z),
@@ -432,6 +432,7 @@ public class WorldBuilder : MonoBehaviour
                 Chunk nChunkAbove = chunks[nBlockAbove.Item2];
                 
                 c.chunkData[blockIndex] = MeshUtils.BlockType.AIR;
+                c.healthData[blockIndex] = MeshUtils.BlockType.NOCRACK;
                 StartCoroutine(Drop(nChunkAbove, nBlockAboveIndex));
 
                 yield return dropDelay;
@@ -444,10 +445,52 @@ public class WorldBuilder : MonoBehaviour
                 c = neighbourChunk;
                 blockIndex = neighbourBlockIndex;
             }
+            else if (MeshUtils.canFlow.Contains(c.chunkData[blockIndex]))
+            {
+                FlowIntoNeighbour(thisBlock, Vector3Int.CeilToInt(c.location), new Vector3Int(1,0,0), strenght-1);
+                FlowIntoNeighbour(thisBlock, Vector3Int.CeilToInt(c.location), new Vector3Int(-1,0,0), strenght-1);
+                FlowIntoNeighbour(thisBlock, Vector3Int.CeilToInt(c.location), new Vector3Int(0,0,1), strenght-1);
+                FlowIntoNeighbour(thisBlock, Vector3Int.CeilToInt(c.location), new Vector3Int(0,0,-1), strenght-1);
+                
+                // implement these directions later maybe
+                //FlowIntoNeighbour(thisBlock, Vector3Int.CeilToInt(c.location), new Vector3Int(1,0,1), strenght-1);
+                //FlowIntoNeighbour(thisBlock, Vector3Int.CeilToInt(c.location), new Vector3Int(1,0,-1), strenght-1);
+                //FlowIntoNeighbour(thisBlock, Vector3Int.CeilToInt(c.location), new Vector3Int(-1,0,1), strenght-1);
+                //FlowIntoNeighbour(thisBlock, Vector3Int.CeilToInt(c.location), new Vector3Int(-1,0,-1), strenght-1);
+                yield break;
+            }
             else
             {
                 yield break;
             }
+        }
+    }
+
+    public void FlowIntoNeighbour(Vector3Int blockPosition, Vector3Int chunkPosition, Vector3Int neighbourDirection, int strenght)
+    {
+        strenght--;
+        if (strenght <= 0)
+        {
+            return;
+        }
+
+        Vector3Int neighbourPosition = blockPosition + neighbourDirection;
+        var neighbourBlock = GetWorldNeighbour(neighbourPosition, chunkPosition);
+        Vector3Int block = neighbourBlock.Item1;
+        int neighbourBlockIndex = ToFlat(block);
+        Chunk neighbourChunk = chunks[neighbourBlock.Item2];
+
+        if (neighbourChunk == null)
+        {
+            return;
+        }
+        
+        if (neighbourChunk.chunkData[neighbourBlockIndex] == MeshUtils.BlockType.AIR)
+        {
+            neighbourChunk.chunkData[neighbourBlockIndex] = chunks[chunkPosition].chunkData[ToFlat(blockPosition)];
+            neighbourChunk.healthData[neighbourBlockIndex] = MeshUtils.BlockType.NOCRACK;
+            RedrawChunk(neighbourChunk);
+            StartCoroutine(Drop(neighbourChunk, neighbourBlockIndex, strenght--));
         }
     }
     

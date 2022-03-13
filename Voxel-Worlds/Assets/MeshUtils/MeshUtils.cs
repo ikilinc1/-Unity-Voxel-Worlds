@@ -20,7 +20,17 @@ public class MeshUtils
     {
         2, 2, 2, 1, 4, 1, 4, -1, 3, 4, -1, -1, -1, -1, -1, -1
     };
+
+    public static HashSet<BlockType> canDrop = new HashSet<BlockType>
+    {
+        BlockType.SAND, BlockType.WATER
+    };
     
+    public static HashSet<BlockType> canFlow = new HashSet<BlockType>
+    {
+        BlockType.WATER
+    };
+
     public enum BlockType {
         GRASSTOP, GRASSSIDE, DIRT, WATER, STONE, SAND, GOLD, BEDROCK, REDSTONE, DIAMOND, NOCRACK,
         CRACK1, CRACK2, CRACK3, CRACK4, AIR
