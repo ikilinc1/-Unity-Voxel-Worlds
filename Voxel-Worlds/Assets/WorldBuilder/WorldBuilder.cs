@@ -245,7 +245,72 @@ public class WorldBuilder : MonoBehaviour
     {
         buildType = (MeshUtils.BlockType) type;
     }
+
+    Vector3Int FromFlat(int i)
+    {
+        return new Vector3Int(i % chunkDimentions.x, 
+            (i / chunkDimentions.x) % chunkDimentions.y,
+            i / (chunkDimentions.x * chunkDimentions.y));
+    }
+
+    int ToFlat(Vector3Int v)
+    {
+        return v.x + chunkDimentions.x * (v.y + chunkDimentions.z * v.z);
+    }
     
+    public System.Tuple<Vector3Int, Vector3Int> GetWorldNeighbour(Vector3Int blockIndex, Vector3Int chunkIndex)
+    {
+        Chunk thisChunk = chunks[chunkIndex];
+        int bx = blockIndex.x;
+        int by = blockIndex.y;
+        int bz = blockIndex.z;
+
+        Vector3Int neighbour = chunkIndex;
+                if (bx == chunkDimentions.x)
+                {
+                    neighbour = new Vector3Int((int) thisChunk.location.x + chunkDimentions.x,
+                        (int) thisChunk.location.y,
+                        (int) thisChunk.location.z);
+                    bx = 0;
+                }else if (bx == -1)
+                {
+                    neighbour = new Vector3Int((int) thisChunk.location.x - chunkDimentions.x,
+                        (int) thisChunk.location.y,
+                        (int) thisChunk.location.z);
+                    bx = chunkDimentions.x - 1;
+                }
+                
+                if (by == chunkDimentions.y)
+                {
+                    neighbour = new Vector3Int((int) thisChunk.location.x,
+                        (int) thisChunk.location.y + chunkDimentions.y,
+                        (int) thisChunk.location.z);
+                    by = 0;
+                }else if (by == -1)
+                {
+                    neighbour = new Vector3Int((int) thisChunk.location.x ,
+                        (int) thisChunk.location.y - chunkDimentions.y,
+                        (int) thisChunk.location.z);
+                    by = chunkDimentions.y - 1;
+                }
+                
+                if (bz == chunkDimentions.z)
+                {
+                    neighbour = new Vector3Int((int) thisChunk.location.x,
+                        (int) thisChunk.location.y,
+                        (int) thisChunk.location.z + chunkDimentions.z);
+                    bz = 0;
+                }else if (bz == -1)
+                {
+                    neighbour = new Vector3Int((int) thisChunk.location.x,
+                        (int) thisChunk.location.y,
+                        (int) thisChunk.location.z - chunkDimentions.z);
+                    bz = chunkDimentions.z - 1;
+                }
+
+                return new Tuple<Vector3Int, Vector3Int>(new Vector3Int(bx, by, bz), neighbour);
+    }
+
     void Update()
     {
         if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
@@ -271,56 +336,11 @@ public class WorldBuilder : MonoBehaviour
                 int bz = (int) (Mathf.Round(hitBlock.z) - thisChunk.location.z);
 
                 //calculatin neighbour chunks
-                Vector3Int neighbour;
-                if (bx == chunkDimentions.x)
-                {
-                    neighbour = new Vector3Int((int) thisChunk.location.x + chunkDimentions.x,
-                        (int) thisChunk.location.y,
-                        (int) thisChunk.location.z);
-                    thisChunk = chunks[neighbour];
-                    bx = 0;
-                }else if (bx == -1)
-                {
-                    neighbour = new Vector3Int((int) thisChunk.location.x - chunkDimentions.x,
-                        (int) thisChunk.location.y,
-                        (int) thisChunk.location.z);
-                    thisChunk = chunks[neighbour];
-                    bx = chunkDimentions.x - 1;
-                }
-                
-                if (by == chunkDimentions.y)
-                {
-                    neighbour = new Vector3Int((int) thisChunk.location.x,
-                        (int) thisChunk.location.y + chunkDimentions.y,
-                        (int) thisChunk.location.z);
-                    thisChunk = chunks[neighbour];
-                    by = 0;
-                }else if (by == -1)
-                {
-                    neighbour = new Vector3Int((int) thisChunk.location.x ,
-                        (int) thisChunk.location.y - chunkDimentions.y,
-                        (int) thisChunk.location.z);
-                    thisChunk = chunks[neighbour];
-                    by = chunkDimentions.y - 1;
-                }
-                
-                if (bz == chunkDimentions.z)
-                {
-                    neighbour = new Vector3Int((int) thisChunk.location.x,
-                        (int) thisChunk.location.y,
-                        (int) thisChunk.location.z + chunkDimentions.z);
-                    thisChunk = chunks[neighbour];
-                    bz = 0;
-                }else if (bz == -1)
-                {
-                    neighbour = new Vector3Int((int) thisChunk.location.x,
-                        (int) thisChunk.location.y,
-                        (int) thisChunk.location.z - chunkDimentions.z);
-                    thisChunk = chunks[neighbour];
-                    bz = chunkDimentions.z - 1;
-                }
+                var blockNeighbour = GetWorldNeighbour(new Vector3Int(bx, by, bz),
+                    Vector3Int.CeilToInt(thisChunk.location));
+                thisChunk = chunks[blockNeighbour.Item2];
                 //---------------------------
-                int i = bx + chunkDimentions.x * (by + chunkDimentions.z * bz); // flatten
+                int i = ToFlat(blockNeighbour.Item1);
                 
                 if (Input.GetMouseButtonDown(0))
                 {
@@ -335,6 +355,15 @@ public class WorldBuilder : MonoBehaviour
                             MeshUtils.blockTypeHealth[(int) thisChunk.chunkData[i]])
                         {
                             thisChunk.chunkData[i] = MeshUtils.BlockType.AIR;
+                            Vector3Int nBlock = FromFlat(i);
+                            var neighbourBlock = GetWorldNeighbour(new Vector3Int(nBlock.x, nBlock.y + 1, nBlock.z),
+                                Vector3Int.CeilToInt(thisChunk.location));
+
+                            Vector3Int block = neighbourBlock.Item1;
+                            int neighbourBlockIndex = ToFlat(block);
+                            Chunk neighboutChunk = chunks[neighbourBlock.Item2];
+                            StartCoroutine(Drop(neighboutChunk, neighbourBlockIndex));
+
                         }
                     }
 
@@ -343,6 +372,7 @@ public class WorldBuilder : MonoBehaviour
                 {
                     thisChunk.chunkData[i] = buildType;
                     thisChunk.healthData[i] = MeshUtils.BlockType.NOCRACK;
+                    StartCoroutine(Drop(thisChunk, i));
                 }
                 
                 RedrawChunk(thisChunk);
@@ -367,6 +397,57 @@ public class WorldBuilder : MonoBehaviour
         {
             c.healthData[blockIndex] = MeshUtils.BlockType.NOCRACK;
             RedrawChunk(c);
+        }
+    }
+
+    private WaitForSeconds dropDelay = new WaitForSeconds(0.2f);
+
+    public IEnumerator Drop(Chunk c, int blockIndex)
+    {
+        if (c.chunkData[blockIndex] != MeshUtils.BlockType.SAND)
+        {
+            yield break;
+        }
+
+        yield return dropDelay;
+        while (true)
+        {
+            Vector3Int thisBlock = FromFlat(blockIndex);
+
+            var neighbourBlock = GetWorldNeighbour(new Vector3Int(thisBlock.x, thisBlock.y - 1, thisBlock.z),
+                Vector3Int.CeilToInt(c.location));
+
+            Vector3Int block = neighbourBlock.Item1;
+            int neighbourBlockIndex = ToFlat(block);
+            Chunk neighbourChunk = chunks[neighbourBlock.Item2];
+            if (neighbourChunk.chunkData[neighbourBlockIndex] == MeshUtils.BlockType.AIR)
+            {
+                neighbourChunk.chunkData[neighbourBlockIndex] = MeshUtils.BlockType.SAND;
+                neighbourChunk.healthData[neighbourBlockIndex] = MeshUtils.BlockType.NOCRACK;
+
+                var nBlockAbove = GetWorldNeighbour(new Vector3Int(thisBlock.x, thisBlock.y + 1, thisBlock.z),
+                    Vector3Int.CeilToInt(c.location));
+                Vector3Int blockAbove = nBlockAbove.Item1;
+                int nBlockAboveIndex = ToFlat(blockAbove);
+                Chunk nChunkAbove = chunks[nBlockAbove.Item2];
+                
+                c.chunkData[blockIndex] = MeshUtils.BlockType.AIR;
+                StartCoroutine(Drop(nChunkAbove, nBlockAboveIndex));
+
+                yield return dropDelay;
+                RedrawChunk(c);
+                if (neighbourChunk != c)
+                {
+                    RedrawChunk(neighbourChunk);
+                }
+
+                c = neighbourChunk;
+                blockIndex = neighbourBlockIndex;
+            }
+            else
+            {
+                yield break;
+            }
         }
     }
     
