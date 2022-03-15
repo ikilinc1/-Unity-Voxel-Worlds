@@ -15,7 +15,7 @@ public class Block
         {
             List<Quad> quads = new List<Quad>();
 
-            if (!HasSolidNeighbour((int) blockLocalPos.x, (int) blockLocalPos.y - 1, (int) blockLocalPos.z))
+            if (!HasSolidNeighbour((int) blockLocalPos.x, (int) blockLocalPos.y - 1, (int) blockLocalPos.z, blockType))
             {
                 if (blockType == MeshUtils.BlockType.GRASSSIDE)
                 {
@@ -27,7 +27,7 @@ public class Block
                 }
             }
 
-            if (!HasSolidNeighbour((int) blockLocalPos.x, (int) blockLocalPos.y + 1, (int) blockLocalPos.z))
+            if (!HasSolidNeighbour((int) blockLocalPos.x, (int) blockLocalPos.y + 1, (int) blockLocalPos.z, blockType))
             {
                 if (blockType == MeshUtils.BlockType.GRASSSIDE)
                 {
@@ -40,22 +40,22 @@ public class Block
                 
             }
 
-            if (!HasSolidNeighbour((int) blockLocalPos.x - 1, (int) blockLocalPos.y, (int) blockLocalPos.z))
+            if (!HasSolidNeighbour((int) blockLocalPos.x - 1, (int) blockLocalPos.y, (int) blockLocalPos.z, blockType))
             {
                 quads.Add(new Quad(MeshUtils.BlockSide.LEFT, offset, blockType, healthType));
             }
 
-            if (!HasSolidNeighbour((int) blockLocalPos.x + 1, (int) blockLocalPos.y, (int) blockLocalPos.z))
+            if (!HasSolidNeighbour((int) blockLocalPos.x + 1, (int) blockLocalPos.y, (int) blockLocalPos.z, blockType))
             {
                 quads.Add(new Quad(MeshUtils.BlockSide.RIGHT, offset, blockType, healthType));
             }
 
-            if (!HasSolidNeighbour((int) blockLocalPos.x, (int) blockLocalPos.y, (int) blockLocalPos.z + 1))
+            if (!HasSolidNeighbour((int) blockLocalPos.x, (int) blockLocalPos.y, (int) blockLocalPos.z + 1, blockType))
             {
                 quads.Add(new Quad(MeshUtils.BlockSide.FRONT, offset, blockType, healthType));
             }
 
-            if (!HasSolidNeighbour((int) blockLocalPos.x, (int) blockLocalPos.y, (int) blockLocalPos.z - 1))
+            if (!HasSolidNeighbour((int) blockLocalPos.x, (int) blockLocalPos.y, (int) blockLocalPos.z - 1, blockType))
             {
                 quads.Add(new Quad(MeshUtils.BlockSide.BACK, offset, blockType, healthType));
             }
@@ -78,13 +78,18 @@ public class Block
         }
     }
 
-    public bool HasSolidNeighbour(int x, int y, int z)
+    public bool HasSolidNeighbour(int x, int y, int z, MeshUtils.BlockType type)
     {
         if (x < 0 || x >= parentChunk.width || y < 0 || y >= parentChunk.height || z < 0 || z >= parentChunk.depth)
         {
             return false;
         }
 
+        if (parentChunk.chunkData[x + parentChunk.width * (y + parentChunk.depth * z)] == type)
+        {
+            return true;
+        }
+        
         if (parentChunk.chunkData[x + parentChunk.width * (y + parentChunk.depth * z)] == MeshUtils.BlockType.AIR
             || parentChunk.chunkData[x + parentChunk.width * (y + parentChunk.depth * z)] == MeshUtils.BlockType.WATER)
         {

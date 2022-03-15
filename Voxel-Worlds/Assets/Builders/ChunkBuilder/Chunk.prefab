@@ -44,12 +44,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   atlas: {fileID: 2100000, guid: 080f6df9bf7f31644ba95198580a24cf, type: 2}
+  fluid: {fileID: 2100000, guid: 4fdaf08ac99ee8d459b39a6207ef7c24, type: 2}
   width: 10
   height: 10
   depth: 10
-  heightScale: 10
-  scale: 0.001
-  octaves: 8
-  heightOffset: -18
   location: {x: 0, y: 0, z: 0}
   chunkData: 
+  healthData: 
+  meshRenderer: {fileID: 0}

@@ -129,7 +129,8 @@ public class WorldBuilder : MonoBehaviour
             c.CreateChunk(chunkDimentions, chunkPos, false);
             chunks.Add(chunkPos,c);
             RedrawChunk(c);
-            c.meshRenderer.enabled = wd.chunkVisibility[vIndex];
+            c.meshRendererSolid.enabled = wd.chunkVisibility[vIndex];
+            c.meshRendererFluid.enabled = wd.chunkVisibility[vIndex];
             vIndex++;
             yield return null;
         }
@@ -209,7 +210,8 @@ public class WorldBuilder : MonoBehaviour
             Vector3Int pos = new Vector3Int(x, y * chunkDimentions.y, z);
             if (chunkChecker.Contains(pos))
             {
-                chunks[pos].meshRenderer.enabled = false;
+                chunks[pos].meshRendererSolid.enabled = false;
+                chunks[pos].meshRendererFluid.enabled = false;
             }
         }
     }
@@ -335,7 +337,7 @@ public class WorldBuilder : MonoBehaviour
                     hitBlock = hit.point + hit.normal / 2.0f;
                 }
 
-                Chunk thisChunk = hit.collider.gameObject.GetComponent<Chunk>();
+                Chunk thisChunk = hit.collider.gameObject.transform.parent.GetComponent<Chunk>();
 
                 int bx = (int) (Mathf.Round(hitBlock.x) - thisChunk.location.x);
                 int by = (int) (Mathf.Round(hitBlock.y) - thisChunk.location.y);
@@ -515,7 +517,8 @@ public class WorldBuilder : MonoBehaviour
                 chunkChecker.Add(position);
                 chunks.Add(position, c);   
             }
-            chunks[position].meshRenderer.enabled = meshEnabled;
+            chunks[position].meshRendererSolid.enabled = meshEnabled;
+            chunks[position].meshRendererFluid.enabled = meshEnabled;
             
         }
         chunkColumns.Add(new Vector2Int(x, z));
