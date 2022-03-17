@@ -25,7 +25,7 @@ public struct PerlinSettings
 public class WorldBuilder : MonoBehaviour
 {
 
-    public static Vector3Int worldDimensions = new Vector3Int(5, 5, 5);
+    public static Vector3Int worldDimensions = new Vector3Int(10, 10, 10);
     public static Vector3Int extraWorldDimensions = new Vector3Int(5, 5, 5);
     public static Vector3Int chunkDimentions = new Vector3Int(10,10,10);
 
@@ -53,6 +53,9 @@ public class WorldBuilder : MonoBehaviour
     
     public static PerlinSettings treeSettings;
     public Perlin3DGrapher trees;
+    
+    public static PerlinSettings biomeSettings;
+    public Perlin3DGrapher biome;
 
     public HashSet<Vector3Int> chunkChecker = new HashSet<Vector3Int>();
     public HashSet<Vector2Int> chunkColumns = new HashSet<Vector2Int>();
@@ -238,6 +241,9 @@ public class WorldBuilder : MonoBehaviour
         
         treeSettings = new PerlinSettings(trees.heightScale, trees.scale, trees.octaves, trees.heighOffset,
             trees.drawCutOff);
+        
+        biomeSettings = new PerlinSettings(biome.heightScale, biome.scale, biome.octaves, biome.heighOffset,
+            biome.drawCutOff);
 
         if (loadFromFile)
         {

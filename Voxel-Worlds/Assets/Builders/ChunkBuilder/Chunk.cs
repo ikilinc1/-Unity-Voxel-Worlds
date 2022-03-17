@@ -99,6 +99,10 @@ public class Chunk : MonoBehaviour
             int plantTree = (int) MeshUtils.fBM3D(x, y, z, WorldBuilder.treeSettings.octaves,
                 WorldBuilder.treeSettings.scale,
                 WorldBuilder.treeSettings.heightScale, WorldBuilder.treeSettings.heightOffset);
+            
+            int desertBiome = (int) MeshUtils.fBM3D(x, y, z, WorldBuilder.biomeSettings.octaves,
+                WorldBuilder.biomeSettings.scale,
+                WorldBuilder.biomeSettings.heightScale, WorldBuilder.biomeSettings.heightOffset);
 
             hData[i] = MeshUtils.BlockType.NOCRACK;
 
@@ -114,9 +118,17 @@ public class Chunk : MonoBehaviour
                 return;
             }
 
-            if (surfaceHeight == y && random.NextFloat(1) <= WorldBuilder.surfaceSettings.probability)
+            if (surfaceHeight == y && random.NextFloat(1) <= WorldBuilder.surfaceSettings.probability && y>= 20)
             {
-                if (plantTree < WorldBuilder.treeSettings.probability && random.NextFloat(1) <= 0.1)
+                if (desertBiome < WorldBuilder.biomeSettings.probability)
+                {
+                    cData[i] = MeshUtils.BlockType.SAND;
+                    if (random.NextFloat(1) <= 0.1f)
+                    {
+                        cData[i] = MeshUtils.BlockType.WOODBASE;
+                    }
+                }
+                else if (plantTree < WorldBuilder.treeSettings.probability && random.NextFloat(1) <= 0.1)
                 {
                     cData[i] = MeshUtils.BlockType.WOODBASE;
                 }
@@ -137,6 +149,10 @@ public class Chunk : MonoBehaviour
             else if (y < surfaceHeight)
             {
                 cData[i] = MeshUtils.BlockType.DIRT;
+            }
+            else if (y < 20)
+            {
+                cData[i] = MeshUtils.BlockType.WATER;
             }
             else
             {
@@ -243,6 +259,7 @@ public class Chunk : MonoBehaviour
         {
             fluidMesh = new GameObject("Fluid");
             fluidMesh.transform.parent = this.gameObject.transform;
+            fluidMesh.AddComponent<UVScroller>();
             mff = fluidMesh.AddComponent<MeshFilter>();
             mrf = fluidMesh.AddComponent<MeshRenderer>();
             meshRendererFluid = mrf;
@@ -338,6 +355,7 @@ public class Chunk : MonoBehaviour
             {
                 mff.mesh = newMesh;
                 MeshCollider collider = fluidMesh.AddComponent<MeshCollider>();
+                fluidMesh.layer = 4;
                 collider.sharedMesh = mff.mesh;
             }
         }
