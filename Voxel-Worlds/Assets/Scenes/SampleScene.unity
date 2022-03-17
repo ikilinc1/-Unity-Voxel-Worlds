@@ -887,6 +887,7 @@ MonoBehaviour:
   goldB: {fileID: 705075953}
   caves: {fileID: 1236138672589064244, guid: 5e94778c0128dee4897d935f6ce9a31f, type: 3}
   trees: {fileID: 1236138672589064244, guid: db8135d9cfd8a3243870b1ec65688161, type: 3}
+  biome: {fileID: 1236138672589064244, guid: 88b08ae04f8b9674d9e3dff8182ae105, type: 3}
   drawRadius: 3
 --- !u!4 &764169035
 Transform:
