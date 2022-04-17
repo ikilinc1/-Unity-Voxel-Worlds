@@ -12,6 +12,10 @@ Used coroutine to be able to see chunks created
 Used parrallel jobs to calculate perlin (chunk and world building optimization)  
 Save and load system uses binary system  
 
+![Screenshot (77)](https://user-images.githubusercontent.com/81098623/163708037-00b6f182-1c79-47a2-ad3a-79cb6eaeef66.png)
+![Screenshot (78)](https://user-images.githubusercontent.com/81098623/163708039-3418d660-4b70-418e-b0cd-e84fede19440.png)
+
+
 Used Packages (Unity Registry)  
  -Burst(1.4.11)    
  -Input System(1.2.1)  
