@@ -23,4 +23,4 @@ Used Packages (Unity Registry)
  -Post Proccessing(3.2.1)  
 
 Unity version-->2020.3.26f1  
-Current proggress --> Finished.
+Current progress --> Finished.
